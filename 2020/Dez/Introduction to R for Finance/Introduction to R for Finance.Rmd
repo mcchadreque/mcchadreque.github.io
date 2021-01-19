@@ -1,0 +1,992 @@
+---
+title: "Quantitative Analyst with R"
+author: "Manuela Chadreque"
+date: "11 de MarÃfÂ§o de 2019"
+output:
+  html_document: default
+  pdf_document: default
+---
+
+#instal and load packedges
+
+
+## Introduction to R for Finance!
+
+###The Basics
+####Arithmetic in R
+Addition: +
+Subtraction: -
+Multiplication: *
+Division: /
+Exponentiation: ^ or **
+Modulo: %%
+```{r}
+# Addition 
+2 + 2
+
+# Subtraction
+4 - 1
+
+# Multiplication
+3 * 4
+
+# Division
+
+4/2
+# Exponentiation
+
+2^4
+# Modulo
+7%%3
+```
+
+###Assignment and variables
+A variable allows you to store a value or an object in R. You can then later use this variable's name to easily access the value or the object that is stored within this variable. You use <- to assign a variable:
+
+my_money <- 100
+
+
+```{r}
+# Assign 200 to savings
+savings <- 200
+
+# Print the value of savings to the console
+savings
+```
+####Aritmetrics with variables
+
+```{r}
+
+# Assign 100 to my_money
+my_money <- 100
+
+# Assign 200 to dans_money
+dans_money<-200
+
+# Add my_money and dans_money
+my_money+dans_money
+
+# Add my_money and dans_money again, save the result to our_money
+our_money<-my_money+dans_money
+print(our_money)
+```
+
+#Financial returns 
+Assume you have $100. During January, you make a 5% return on that money. How much do you have at the end of January? Well, you have 100% of your starting money, plus another 5%: 100% + 5% = 105%. In decimals, this is 1 + .05 = 1.05. This 1.05 is the return multiplier for January, and you multiply your original $100 by it to get the amount you have at the end of January.
+
+105 = 100 * 1.05
+
+Or in terms of variables:
+
+post_jan_cash <- starting_cash * jan_ret
+
+A quick way to get the multiplier is:
+
+multiplier = 1 + (return / 100)
+ If, in February, you earn another 2% on your cash, how would you calculate the total amount at the end of February? You already know that the amount at the end of January is $100 * 1.05 = $105. To get from the end of January to the end of February, just use another multiplier!
+
+$105 * 1.02 = $107.1
+
+Which is equivalent to:
+
+$100 * 1.05 * 1.02 = $107.1
+
+```{r}
+
+# Variables for starting_cash and 5% return during January
+starting_cash <- 200
+jan_ret <- 5
+jan_mult <- 1 + (jan_ret / 100)
+
+# How much money do you have at the end of January?
+post_jan_cash <- starting_cash*jan_mult
+
+# Print post_jan_cash
+post_jan_cash
+
+# January 10% return multiplier
+jan_ret_10 <- 10
+jan_mult_10 <- 1+(jan_ret_10/100)
+
+# How much money do you have at the end of January now?
+post_jan_cash_10 <- starting_cash*jan_mult_10
+
+
+# Print post_jan_cash_10
+post_jan_cash_10
+
+ 
+# Starting cash and returns 
+starting_cash <- 200
+jan_ret <- 4
+feb_ret <- 5
+
+# Multipliers
+jan_mult <- 1+(jan_ret/100)
+feb_mult <- 1+feb_ret/100
+
+# Total cash at the end of the two months
+total_cash <- starting_cash*jan_mult*feb_mult
+
+# Print total_cash
+total_cash
+```
+###Data type exploration
+To get started, here are some of R's most basic data types:
+
+Numerics are decimal numbers like 4.5. A special type of numeric is an integer, which is a numeric without a decimal piece. Integers must be specified like 4L.
+Logicals are the boolean values TRUE and FALSE. Capital letters are important here; true and false are not valid.
+Characters are text values like "hello world".
+
+####What's that data type?
+Up until now, you have been determining what data type a variable is just by looks. There is actually a better way to check this.
+
+class(my_var)
+
+```{r}
+# 
+# # company's stock price is a numeric
+# company_stock <- 150.45
+# 
+# # Bond credit ratings are characters
+# credit_rating <-"AAA"
+# 
+# # You like the stock market. TRUE or FALSE?
+# my_answer <- TRUE
+# 
+# # Print my_answer
+# my_answer
+
+```
+
+###Vector
+####c()ombine
+Now is where things get fun! It is time to create your first vector. Since this is a finance oriented course, it is only appropriate that your first vector be a numeric vector of stock prices. Remember, you create a vector using the combine function, c(), and each element you add is separated by a comma.
+We can also add names to each return in your vector. You do this using names()
+```{r}
+
+# Another numeric vector
+ibm_stock <- c(159.82, 160.02, 159.84)
+
+# Another character vector
+finance <-c("stocks", "bonds", "investments")
+
+# A logical vector
+logic <- c(TRUE,FALSE,TRUE)
+
+
+# Vectors of 12 months of returns, and month names
+ret <- c(5, 2, 3, 7, 8, 3, 5, 9, 1, 4, 6, 3)
+months <- c("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec")
+
+# Add names to ret
+names(ret) <- months
+
+# Print out ret to see the new names!
+ret
+
+```
+
+###Visualize your vector
+The plot() function is one of the many ways to create a graph from your data in R. Passing in a vector will add its values to the y-axis of the graph, and on the x-axis will be an index created from the order that your vector is in.
+
+Inside of plot(), you can change the type of your graph using type =. The default is "p" for points, but you can also change it to "l" for line.
+
+``` {r}
+
+apple_stock <- c(109.49, 109.90, 109.11, 109.95, 111.03, 112.12)
+credit_rating <- c("AAA", "AA", "BBB", "BB", "B")
+micr<-c(59.20,59.25,60.22,59.95,61.37,61.01,61.97,62.17,62.98,62.68,62.58,62.30
+,63.62,63.54,63.54,63.55,63.24,63.28,62.99,62.90,62.14)
+
+# Look at the data
+apple_stock
+
+# Plot the data points
+plot(apple_stock)
+
+# Plot the data as a line graph
+plot(apple_stock, type = "l")
+
+```
+####Weighted average
+As a finance professional, there are a number of important calculations that you will have to know. One of these is the weighted average. The weighted average allows you to calculate your portfolio return over a time period. Consider the following example:
+
+Assume you have 40% of your cash in Apple stock, and 60% of your cash in IBM stock. If, in January, Apple earned 5% and IBM earned 7%, what was your total portfolio return?
+
+To calculate this, take the return of each stock in your portfolio, and multiply it by the weight of that stock. Then sum up all of the results. For this example, you would do:
+
+6.2 = 5 * .4 + 7 * .6
+
+Or, in variable terms:
+
+portf_ret <- apple_ret * apple_weight + ibm_ret * ibm_weight
+
+```{r}
+
+# Weights and returns
+micr_ret<- 7
+sony_ret <- 9
+micr_weight <- .2
+sony_weight <- .8
+
+# Portfolio return
+portf_ret <-micr_ret * micr_weight + sony_ret * sony_weight
+
+
+# Weights, returns, and company names
+ret <- c(7, 9)
+weight <- c(.2, .8)
+companies <- c("Microsoft", "Sony")
+
+# Assign company names to your vectors
+names(ret) <- companies
+names(weight) <- companies
+
+# Multiply the returns and weights together 
+ret_X_weight <- ret*weight
+
+# Print ret_X_weight
+ret_X_weight
+
+# Sum to get the total portfolio return
+portf_ret <-sum(ret_X_weight)
+
+# Print portf_ret
+sum(portf_ret)
+
+
+# Print ret
+ret 
+
+# Assign 1/3 to weight
+weight <- 1/3
+
+# Create ret_X_weight
+ret_X_weight <- ret*weight
+
+# Calculate your portfolio return
+portf_ret <- sum(ret_X_weight)
+
+# Vector of length 3 * Vector of length 2?
+ret * c(.2, .6)
+```
+
+####Vector subsetting
+Sometimes, you will only want to use specific pieces of your vectors, and you'll need some way to access just those parts. For example, what if you only wanted the first month of returns from the vector of 12 months of returns? To solve this, you can subset the vector using [ ].
+
+Here is the 12 month return vector:
+
+ret <- c(5, 2, 3, 7, 8, 3, 5, 9, 1, 4, 6, 3)
+
+Select the first month: ret[1].
+
+Select the first month by name: ret["Jan"].
+
+Select the first three months: ret[1:3] or ret[c(1, 2, 3)].
+
+
+```{r}
+ret <- c(5, 2, 3, 7, 8, 3, 5, 9, 1, 4, 6, 3)
+
+# First 6 months of returns
+ret[1:6]
+
+# Just March and May
+ret[c("Mar","May")]
+
+# Omit the first month of returns
+ret[-1]
+```
+
+###Matrix
+Matrices are similar to vectors, except they are in 2 dimensions! Let's create a 2x2 matrix "by hand" using matrix().
+
+```{r}
+
+# A vector of 9 numbers
+my_vector <- c(1, 2, 3, 4, 5, 6, 7, 8, 9)
+
+# 3x3 matrix
+my_matrix <- matrix(data = my_vector, nrow = 3, ncol =3)
+
+# Print my_matrix
+my_matrix
+
+# Filling across using byrow = TRUE
+apple_micr_matrix<-matrix(data = c(2, 3, 4, 5), nrow = 2, ncol = 2, byrow = TRUE)
+
+# View the data
+apple_micr_matrix
+
+# Scatter plot of Microsoft vs Apple
+plot(apple_micr_matrix)
+
+```
+###cor()relation
+The cor() function will calculate the correlation between two vectors, or will create a correlation matrix when given a matrix.
+
+```{r}
+apple <- c(109.49, 109.90, 109.11, 109.95, 111.03)
+ibm <- c(159.82, 160.02, 159.84, 160.35, 164.79)
+
+# cbind the vectors together
+cbind_stocks <- cbind(apple,ibm,micr)
+
+# Print cbind_stocks
+cbind_stocks
+
+# rbind the vectors together
+rbind_stocks <- rbind(apple,ibm,micr)
+
+# Print rbind_stocks
+rbind_stocks
+
+```
+###Matrix subsetting
+Matrix subsetting
+Just like vectors, matrices can be selected from and subsetted! To do this, you will again use [ ], but this time it will have two inputs. The basic structure is:
+
+my_matrix[row, col]
+
+Then: To select the first row and first column of stocks from the last example: stocks[1,1]
+
+To select the entire first row, leave the col empty: stocks[1, ]
+
+To select the first two rows: stocks[1:2, ] or stocks[c(1,2), ]
+
+To select an entire column, leave the row empty: stocks[, 1]
+
+You can also select an entire column by name: stocks[, "apple"]
+
+```{r}
+stocks<-cbind_stocks
+# Third row
+stocks[3,]
+
+# Fourth and fifth row of the ibm column
+stocks[c(4,5),"ibm"]
+
+# apple and micr columns
+stocks[,c("apple","micr")]
+
+```
+
+###data.frame()
+Data frames are great because of their ability to hold a different type of data in each column. To get started, let's use the data.frame() function to create a data frame of your business's future cash flows. Here are the variables that will be in the data frame:
+
+company - The company that is paying you the cash flow (A or B).
+cash_flow - The amount of money a company will receive.
+year - The number of years from now that you receive the cash flow.
+
+```{r}
+# Variables
+company <- c("A", "A", "A", "B", "B", "B", "B")
+cash_flow <- c(1000, 4000, 550, 1500, 1100, 750, 6000)
+year <- c(1, 3, 4, 1, 2, 4, 5)
+
+# Data frame
+cash <- data.frame(company,cash_flow,year)
+
+# Print cash
+cash
+
+```
+###Making head()s and tail()s of your data with some str()ucture
+Time to introduce a few simple, but very useful functions.
+
+head() - Returns the first few rows of a data frame. By default, 6. To change this, use head(cash, n = ___)
+tail() - Returns the last few rows of a data frame. By default, 6. To change this, use tail(cash, n = ___)
+str() - Check the structure of an object. This fantastic function will show you the data type of the object you pass in (here, data.frame), and will list each column variable along with its data type.
+With a small data set such as yours, head() and tail() are not incredibly useful, but imagine if you had a data frame of hundreds or thousands of rows!
+
+```{r}
+# Call head() for the first 4 rows
+head(cash,n=4)
+
+# Call tail() for the last 3 rows
+tail(cash,n=3)
+
+# Call str()
+str(cash)
+```
+
+####Naming your columns / rows
+```{r}
+
+# Fix your column names
+colnames(cash)<-c("company","cash_flow","year")
+
+# Print out the column names of cash
+names(cash)
+```
+####Accessing and subsetting data frames (1)
+Even more often than with vectors, you are going to want to subset your data frame or access certain columns. Again, one of the ways to do this is to use [ ]. The notation is just like matrices! Here are some examples:
+
+Select the first row: cash[1, ]
+
+Select the first column: cash[ ,1]
+
+Select the first column by name: cash[ ,"company"]
+
+Accessing and subsetting data frames (2)
+As you might imagine, selecting a specific column from a data frame is a common manipulation. So common, in fact, that it was given its own shortcut, the $. The following return the same answer:
+
+cash$cash_flow
+
+[1] 1000 4000  550 1500 1100  750 6000
+
+cash[,"cash_flow"]
+
+[1] 1000 4000  550 1500 1100  750 6000
+Accessing and subsetting data frames (3)
+Often, just simply selecting a column from a data frame is not all you want to do. What if you are only interested in the cash flows from company A? For more flexibility, try subset()!
+
+subset(cash, company == "A")
+
+  company cash_flow year
+1       A      1000    1
+2       A      4000    3
+3       A       550    4
+
+```{r}
+
+# Third row, second column
+cash[3,2]
+
+
+# Fifth row of the "year" column
+cash[5,"year"]
+
+
+# Select the year column
+cash$year
+
+# Select the cash_flow column and multiply by 2
+cash$cash_flow*2
+
+# Delete the company column
+cash$company <- NULL
+
+# Print cash again
+cash
+
+# Rows about company B
+subset(cash,company=="B")
+
+# Rows with cash flows due in 1 year
+subset(cash,year==1)
+
+```
+
+###Adding new columns
+In a perfect world, you could be 100% certain that you will receive all of your cash flows. But, since these are predictions about the future, there is always a chance that someone won't be able to pay! You decide to run some analysis about a worst case scenario where you only receive half of your expected cash flow. To save the worst case scenario for later analysis, you decide to add it as a new column to the data frame!
+
+cash$half_cash <- cash$cash_flow * .5
+
+cash
+
+  company cash_flow year half_cash
+1       A      1000    1       500
+2       A      4000    3      2000
+3       A       550    4       275
+4       B      1500    1       750
+5       B      1100    2       550
+6       B       750    4       375
+7       B      6000    5      3000
+
+```{r}
+
+# Quarter cash flow scenario
+cash$quarter_cash <-cash$cash_flow*0.25
+
+# Double year scenario
+cash$double_year<-cash$year*2
+
+
+```
+###Present value of projected cash flows
+If you expect a cash flow of $100 to be received 1 year from now, what is the present value of that cash flow at a 5% interest rate? To calculate this, you discount the cash flow to get it in terms of today's dollars. The general formula for this is:
+
+present_value <- cash_flow * (1 + interest / 100) ^ -year
+
+95.238 = 100 * (1.05) ^ -1
+
+Another way to think about this is to reverse the problem. If you have $95.238 today, and it earns 5% over the next year, how much money do you have at the end of the year? We know how to do this problem from way back in chapter 1! Find the multiplier that corresponds to 5% and multiply by $95.238!
+
+100 = 95.238 * (1.05)
+
+```{r}
+
+# Present value of $4000, in 3 years, at 5%
+present_value_4k <- 4000*(1+0.05)^-3
+
+# Present value of all cash flows
+cash$present_value <-cash$cash_flow*(1+0.05)^-cash$year
+
+# Print out cash
+cash
+
+
+# Total present value of cash
+total_pv <- sum(cash$present_value)
+
+# Company B information
+cash_B <- subset(cash,company=="B")
+
+# Total present value of cash_B
+total_pv_B <- sum(cash_B$present_value)
+
+```
+
+###Factor
+Bond credit ratings are common in the fixed income side of the finance world as a simple measure of how "risky" a certain bond might be. Here, riskiness can be defined as the probability of default, which means an inability to pay back your debts. The Standard and Poor's and Fitch credit rating agency has defined the following ratings, from least likely to default to most likely:
+
+AAA, AA, A, BBB, BB, B, CCC, CC, C, D
+This is a perfect example of a factor! It is a categorical variable that takes on a limited number of levels.
+
+To create a factor in R, use the factor() function, and pass in a vector that you want to be converted into a factor.
+
+Suppose you have a portfolio of 7 bonds with these credit ratings:
+
+credit_rating <- c("AAA", "AA", "A", "BBB", "AA", "BBB", "A")
+
+To create a factor from this:
+
+factor(credit_rating)
+
+[1] AAA AA  A   BBB AA  BBB A  
+Levels: A AA AAA BBB
+
+```{r}
+
+# credit_rating character vector
+credit_rating <- c("BB", "AAA", "AA", "CCC", "AA", "AAA", "B", "BB")
+
+# Create a factor from credit_rating
+credit_factor <- factor(credit_rating)
+
+# Print out your new factor
+credit_factor
+
+# Call str() on credit_rating
+str(credit_rating)
+
+# Call str() on credit_factor
+str(credit_factor)
+
+
+# Identify unique levels
+levels(credit_factor)
+
+# Rename the levels of credit_factor
+levels(credit_factor)<-c("2A","3A","1B","2B","3C")
+
+# Print credit_factor
+credit_factor
+```
+
+###Factor summary
+
+As any good bond investor would do, you would like to keep track of how many bonds you are holding of each credit rating. A way to present a table of the counts of each bond credit rating would be great! Luckily for you, the summary() function for factors can help you with that.
+
+
+```{r}
+
+# Summarize the character vector, credit_rating
+summary(credit_rating)
+
+# Summarize the factor, credit_factor
+summary(credit_factor)
+```
+
+###Visualize your factor
+You can also visualize the table that you created in the last example by using a bar chart. A bar chart is a type of graph that displays groups of data using rectangular bars where the height of each bar represents the number of counts in that group.
+
+The plot() function can again take care of all of the magic for you, check it out!
+
+```{r}
+
+# Visualize your factor!
+plot(credit_factor)
+
+```
+####Bucketing a numeric variable into a factor
+Your old friend Dan sent you a list of 50 AAA rated bonds called AAA_rank, with each bond having an additional number from 1-100 describing how profitable he thinks that bond will be (100 being the most profitable). You are interested in doing further analysis on his suggestions, but first it would be nice if the bonds were bucketed by their ranking somehow. This would help you create groups of bonds, from least profitable to most profitable, to more easily analyze them.
+
+This is a great example of creating a factor from a numeric vector. The easiest way to do this is to use cut(). Below, Dan's 1-100 ranking is bucketed into 5 evenly spaced groups. Note that the ( in the factor levels means we do not include the number beside it in that group, and the ] means that we do include that number in the group.
+
+```{r}
+AAA_rank<-c(31,48,100,53,85,73,62,74,42,38,97,61,48,86,44,9,43,18,62,31,48,100,53,85,73,62,74,42,38,97,61,48,86,44,9,43,18,62,31,48,100,53,85,73,62,74,42,38,97,61,48,86,44,9,43,18,62)
+AAA_factor <- cut(x = AAA_rank, breaks = c(0, 20, 40, 60, 80, 100))
+head(AAA_factor)
+
+# Create 4 buckets for AAA_rank using cut()
+AAA_factor <- cut(x = AAA_rank, breaks = c(0,25,50,75,100))
+
+# Rename the levels 
+levels(AAA_factor)<-c("low","medium","high","very_high")
+
+# Print AAA_factor
+AAA_factor
+
+# Plot AAA_factor
+plot(AAA_factor)
+
+```
+Create an ordered factor
+Look at the plot created over on the right. It looks great, but look at the order of the bars! No order was specified when you created the factor, so, when R tried to plot it, it just placed the levels in alphabetical order. By now, you know that there is an order to credit ratings, and your plots should reflect that!
+
+As a reminder, the order of credit ratings from least risky to most risky is:
+
+AAA, AA, A, BBB, BB, B, CCC, CC, C, D
+To order your factor, there are two options.
+
+When creating a factor, specify ordered = TRUE and add unique levels in order from least to greatest:
+
+```{r}
+
+# Use unique() to find unique words
+unique(credit_rating)
+
+# Create an ordered factor
+credit_factor_ordered <- factor(credit_rating, ordered = TRUE, levels = c("AAA","AA","BB","B","CCC"))
+
+# Plot credit_factor_ordered
+plot(credit_factor_ordered)
+```
+
+Subsetting a factor
+You can subset factors in a similar way that you subset vectors. As usual, [ ] is the key! However, R has some interesting behavior when you want to remove a factor level from your analysis. For example, what if you wanted to remove the AAA bond from your portfolio?
+
+credit_factor
+
+[1] AAA AA  A   BBB AA  BBB A  
+Levels: BBB < A < AA < AAA
+
+credit_factor[-1]
+
+[1] AA  A   BBB AA  BBB A  
+Levels: BBB < A < AA < AAA
+R removed the AAA bond at the first position, but left the AAA level behind! If you were to plot this, you would end up with the bar chart over to the right. A better plan would have been to tell R to drop the AAA level entirely. To do that, add drop = TRUE:
+
+credit_factor[-1, drop = TRUE]
+
+[1] AA  A   BBB AA  BBB A  
+Levels: BBB < A < AA
+
+```{r}
+
+# Remove the A bonds at positions 3 and 7. Don't drop the A level.
+keep_level <- credit_factor[-c(3,7)]
+
+# Plot keep_level
+plot(keep_level)
+
+# Remove the A bonds at positions 3 and 7. Drop the A level.
+drop_level <-credit_factor[-c(3,7),drop="TRUE"]
+
+# Plot drop_level
+plot(drop_level)
+
+```
+stringsAsFactors
+Do you remember back in the data frame chapter when you used str() on your cash data frame? This was the output:
+
+str(cash)
+
+'data.frame':    3 obs. of  3 variables:
+ $ company  : Factor w/ 2 levels "A","B": 1 1 2
+ $ cash_flow: num  100 200 300
+ $ year     : num  1 3 2
+See how the company column has been converted to a factor? R's default behavior when creating data frames is to convert all characters into factors. This has caused countless novice R users a headache trying to figure out why their character columns are not working properly, but not you! You will be prepared!
+
+```{r}
+
+# Variables
+credit_rating <- c("AAA", "A", "BB")
+bond_owners <- c("Dan", "Tom", "Joe")
+
+# Create the data frame of character vectors, bonds
+bonds <-data.frame(credit_rating,bond_owners,stringsAsFactors = FALSE)
+
+
+# Use str() on bonds
+str(bonds)
+
+# Create a factor column in bonds called credit_factor from credit_rating
+bonds$credit_factor <- factor(bonds$credit_rating, ordered = TRUE, levels = c("AAA","A","BB"))
+
+# Use str() on bonds again
+str(bonds)
+
+```
+
+Create a list
+Just like a grocery list, lists in R can be used to hold together items of different data types. Creating a list is, you guessed it, as simple as using the list() function. You could say that a list is a kind of super data type: you can store practically any piece of information in it! Create a list like so:
+
+words <- c("I <3 R")
+numbers <- c(42, 24)
+
+my_list <- list(words, numbers)
+
+my_list
+
+[[1]]
+[1] "I <3 R"
+
+[[2]]
+[1] 42 24
+Below, you will create 
+
+```{r}
+# List components
+name <- "Apple and IBM"
+apple <- c(109.49, 109.90, 109.11, 109.95, 111.03)
+ibm <- c(159.82, 160.02, 159.84, 160.35, 164.79)
+cor_matrix <- cor(cbind(apple, ibm))
+
+# Create a list
+portfolio <- list(name,apple,ibm,cor_matrix)
+
+# View your first list
+portfolio
+```
+Named lists
+Knowing how forgetful you are, you decide it would be important to add names to your list so you can remember what each element is describing. There are two ways to do this!
+
+You could name the elements as you create the list with the form name = value:
+
+my_list <- list(my_words = words, my_numbers = numbers)
+Or, if the list was already created, you could use names():
+
+my_list <- list(words, numbers)
+names(my_list) <- c("my_words", "my_numbers") 
+Both would result in:
+
+my_list
+
+$my_words
+[1] "I <3 R"
+
+$my_numbers
+[1] 42 24
+
+```{r}
+
+# Add names to your portfolio
+names(portfolio)<-c("portfolio_name", "apple", "ibm", "correlation")
+
+# Print portfolio
+portfolio
+```
+
+Access elements in a list
+Subsetting a list is similar to subsetting a vector or data frame, with one extra useful operation.
+
+To access the elements in the list, use [ ]. This will always return another list.
+
+my_list[1]
+
+$my_words
+[1] "I <3 R"
+
+my_list[c(1,2)]
+
+$my_words
+[1] "I <3 R"
+
+$my_numbers
+[1] 42 24
+To pull out the data inside each element of your list, use [[ ]].
+
+my_list[[1]]
+
+[1] "I <3 R"
+If your list is named, you can use the $ operator: my_list$my_words. This is the same as using [[ ]] to return the inner data.
+
+```{r}
+
+# Second and third elements of portfolio
+portfolio[c(2,3)]
+
+# Use $ to get the correlation data
+portfolio$correlation
+
+```
+Adding to a list
+Once you create a list, you aren't stuck with it forever. You can add new elements to it whenever you want! Say you want to add your friend Dan's favorite movie to your list. You can do so using $ like you did when adding new columns to data frames.
+
+my_list$dans_movie <- "StaR Wars"
+
+my_list
+
+$my_words
+[1] "I <3 R"
+
+$my_numbers
+[1] 42 24
+
+$dans_movie
+[1] "StaR Wars"
+You could have also used c() to add another element to the list: c(my_list, dans_movie = "StaR Wars"). This can be useful if you want to add multiple elements to your list at once.
+
+```{r}
+
+# Add weight: 20% Apple, 80% IBM
+portfolio$weight <- c(apple = 0.2, ibm = 0.8)
+
+# Print portfolio
+portfolio
+
+
+# Change the weight variable: 30% Apple, 70% IBM
+portfolio$weight<- c(apple = 0.3, ibm = 0.7)
+
+# Print portfolio to see the changes
+portfolio
+
+```
+Removing from a list
+The natural next step is to learn how to remove elements from a list. You decide that even though Dan is your best friend, you don't want his info in your list. To remove dans_movie:
+
+my_list$dans_movie <- NULL
+
+my_list
+
+$my_words
+[1] "I <3 R"
+
+$my_numbers
+[1] 42 24
+Using NULL is the easiest way to remove an element from your list! If your list is not named, you can also remove elements by position using my_list[1] <- NULL or my_list[[1]] <- NULL
+
+```{r}
+
+# Take a look at portfolio
+portfolio
+
+# Remove the microsoft stock prices from your portfolio
+portfolio$microsoft<-NULL
+portfolio
+```
+
+Split it
+Often, you will have data for multiple groups together in one data frame. The cash data frame was an example of this back in Chapter 3. There were cash_flow and year columns for two groups (companies A and B). What if you wanted to split up this data frame into two separate data frames divided by company? In the next exercise, you will explore why you might want to do this, but first let's explore how to make this happen using the split() function.
+
+Create a grouping to split on, and use split() to create a list of two data frames.
+
+grouping <- cash$company
+split_cash <- split(cash, grouping)
+
+split_cash 
+
+$A
+  company cash_flow year
+1       A      1000    1
+2       A      4000    3
+3       A       550    4
+
+$B
+  company cash_flow year
+4       B      1500    1
+5       B      1100    2
+6       B       750    4
+7       B      6000    5
+
+```{r}
+
+# Define grouping from year
+grouping <- cash$year
+
+# Split cash on your new grouping
+split_cash <- split(cash,grouping)
+
+# Look at your split_cash list
+split_cash
+
+# Unsplit split_cash to get the original data back.
+original_cash <- unsplit(split_cash,grouping)
+
+# Print original_cash
+original_cash
+
+```
+
+Split-Apply-Combine
+A common data science problem is to split your data frame by a grouping, apply some transformation to each group, and then recombine those pieces back into one data frame. This is such a common class of problems in R that it has been given the name split-apply-combine. In Intermediate R for Finance, you will explore a number of these problems and functions that are useful when solving them, but, for now, let's do a simple example.
+
+Suppose, for the cash data frame, you are interested in doubling the cash_flow for company A, and tripling it for company B:
+
+grouping <- cash$company
+split_cash <- split(cash, grouping)
+
+# We can access each list element's cash_flow column by:
+split_cash$A$cash_flow
+[1] 1000 4000  550
+
+split_cash$A$cash_flow <- split_cash$A$cash_flow * 2
+split_cash$B$cash_flow <- split_cash$B$cash_flow * 3
+
+new_cash <- unsplit(split_cash, grouping)
+Take a look again at how you access the cash_flow column. The first $ is to access the A element of the split_cash list. The second $ is to access the cash_flow column of the data frame in A.
+
+```{r}
+
+# Print split_cash
+split_cash
+
+# Print the cash_flow column of B in split_cash
+split_cash$B$cash_flow
+
+# Set the cash_flow column of company A in split_cash to 0
+split_cash$A$cash_flow <-0
+
+# Use the grouping to unsplit split_cash
+cash_no_A <- unsplit(split_cash,grouping)
+
+# Print cash_no_A
+cash_no_A
+
+```
+Attributes
+You have made it to the last exercise in the course! Congrats! Let's finish up with an easy one.
+
+Attributes are a bit of extra metadata about your data structure. Some of the most common attributes are: row names and column names, dimensions, and class. You can use the attributes() function to return a list of attributes about the object you pass in. To access a specific attribute, you can use the attr() function.
+
+Exploring the attributes of cash:
+
+attributes(cash)
+
+$names
+[1] "company"   "cash_flow" "year"     
+
+$row.names
+[1] 1 2 3 4 5 6 7
+
+$class
+[1] "data.frame"
+
+attr(cash, which = "names")
+
+[1] "company"   "cash_flow" "year"     
+
+```{r}
+
+# my_matrix and my_factor
+my_matrix <- matrix(c(1,2,3,4,5,6), nrow = 2, ncol = 3)
+rownames(my_matrix) <- c("Row1", "Row2")
+colnames(my_matrix) <- c("Col1", "Col2", "Col3")
+
+my_factor <- factor(c("A", "A", "B"), ordered = T, levels = c("A", "B"))
+
+# attributes of my_matrix
+attributes(my_matrix)
+
+# Just the dim attribute of my_matrix
+attr(my_matrix,"dim")
+
+# attributes of my_factor
+attributes(my_factor)
+
+```
