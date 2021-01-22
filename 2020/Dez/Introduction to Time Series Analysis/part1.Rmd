@@ -1,0 +1,265 @@
+---
+title: "Time Series Analysis Part 1"
+author: "Manuela da Cruz Chadreque"
+date: "29 de Dez de 2020"
+output: 
+  html_document: 
+    fig_caption: yes
+    keep_md: yes
+    number_sections: yes
+    theme: paper
+    toc: true
+    toc_depth: 2
+    toc_float:
+      collapsed: false
+      smooth_scroll: true
+editor_options: 
+  chunk_output_type: inline
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+```{r eval=FALSE, include=FALSE}
+setwd("C:\Users\maiam\Dropbox\ABRIL-MAIO 2020\PYTHON\PORTFOLIO\TUTORIALS\r\Introduction to Time Series Analysis")
+```
+# Exploratory Time Series
+
+Time Series are data that from the observation of a real phenomenon for a period of time. We have at our disposal, a wide range of tools and techniques to identify models that can help us to:
+
+1. Describe relevant patterns on the time series;
+
+2. Explain how the past can affect the future;
+
+3. Explain how can two series can interact;
+
+4. Forecast the future.
+
+##Time Series Exploratory analysis
+
+Usually the first step when analyzing a time series is to plot our data so we can visualize features such as the patterns, unusual observations, changes over time or relationship between variables. I this step it helps, if we answer the following questions:
+
+1. Is there a trend over time? 
+  + On average, the measurements tend to increase (or decrease) over time?
+  + Is the trend Linear or Exponential?
+
+2. Is there seasonality,
+  + Is there a regularly repeating pattern of highs and lows related to calendar time such as seasons, quarters, months, days of the week?
+  + Is the seasonal component increase in magnitude across time?
+
+
+3. Are their outliers? In regression, outliers are far away from your line. With time series data, your outliers are far away from your other data.
+
+4. Is there a long-run cycle or period unrelated to seasonality factors?
+
+5. Is the variance non-constant? 
+  + Are there any abrupt changes to either the level of the series or the variance?
+  
+To better be familiarized with time series exporatory analysis we have choose the following real data sets:
+
+* OR Tambo South African Airport Monthly average Temperatures(2017-2019);
+
+* Eskom Electricity sales to Mozambique(1996 - 2006);
+
+* Rwanda annual GDP. 1960-2018;
+
+* Daily Dam levels for major and minor dams in the Western Cape water supply system. 2011-2019;
+
+* And Daily closing Shoprite stock prices.
+
+On the present article we will use the r, the following post covers the same steps in python.
+1. Install and load libraries;
+2. Import Data set using functions such as [read_csv()](https://readr.tidyverse.org/reference/read_delim.html) to import the csv file and [getSymbols()](https://www.rdocumentation.org/packages/quantmod/versions/0.4-15/topics/getSymbols) function.
+
+3. Create Time Series Object using [ts()](https://www.rdocumentation.org/packages/stats/versions/3.6.1/topics/ts) function or [xts()](https://www.rdocumentation.org/packages/xts/versions/0.11-2/topics/xts) function.
+
+2. Manipulate and plot the data set using the
+  [plot.ts() function](https://cran.r-project.org/web/packages/ggfortify/vignettes/plot_ts.html) or[plot.ts](https://www.uni-muenster.de/ZIV.BennoSueselbeck/s-html/helpfiles/ts.plot.html)...
+  
+3. Analyse.
+
+
+```{r include=FALSE}
+library(fpp)
+library(tsdl)
+library(forecast)
+library(readr)
+library(ggfortify)
+library(zoo)
+library(xts)
+library(tibble )
+library(quantmod)
+#To avoid error  while installing  tsdl packedge, we will install the packedge remotelly
+#install.packages("remotes")
+#remotes::install_github("FinYang/tsdl")
+library(tsdl)
+```
+
+### Or Tambo Monthly Average Temperatures
+
+```{r}
+#Import Data 
+temp<-read_csv("https://www.dropbox.com/s/pf9ah91vrirzs8m/ORTamboTemp.csv?dl=1", skip=3)
+
+#Create a time series object
+ORtemp<-ts(temp,start=2017, frequency=12)#this makes sure R knows that temp is a time series, starting Jan 2017 with a Monthly frequence
+#Visualize tem created object
+ORtemp
+
+#Plot the ts object
+autoplot(ORtemp,colour = 'blue') + 
+  ggtitle("O. R. Tambo temperatures time series") + 
+  geom_hline(yintercept=mean(ORtemp), color = "red")+ #add a mean horizontal line 
+  xlab("Time (Year)") + 
+  ylab("Temperatures (C)") +
+  theme_bw() +
+  theme(plot.title = element_text(hjust = 0.5)) 
+
+#Plot the Monthly Data
+monthplot(ORtemp,ylab="Average Temperature cº",xlab="Month",xaxt="n",main="Monthly Average Temperatures")
+axis(1,at=1:12,labels=month.abb,cex=0.8)
+```
+ 
+Analysist
+
+1. Trend: yes(do not have a constant mean-using the abline we can evaluate if there is a trend or not)
+sazonalyty:yes
+ + Outliers: No
+ + cycle: No
+ + variance: do not have a constant variance
+
+## Anual Eskom Electricity Sales to Mozambique from 1996 to 2006
+
+Eskom is a South African electricity public utility, established in 1923 as the Electricity Supply Commission (ESCOM). The utility is the largest producer of electricity in Africa exporting electricity to Botswana, Mozambique, Namibia, Zimbabwe, Lesotho, Swaziland	and Zambia.
+Our dataset is a subset of the [Eskom Table - Table 2.csv](http://energydata.uct.ac.za/dataset/eskom-holdings-limited-annual-report/resource/18894e94-873e-4617-95f2-b6fa2e3131f4)
+
+```{r}
+#Importing Data
+Elecsales<-read_csv("https://www.dropbox.com/s/950n1na0omcvi7n/eskom-table-table-2_Mozambique.csv?dl=1", skip=3)
+
+#Create a ts ttime series object
+Elecsales<-ts(Elecsales,start=1996, frequency=1)
+Elecsales
+
+
+plot.ts(Elecsales,type="b",xlab="Time",ylab="Annual Eskom Electric Sales for Mozambique in GWh") #time series plot of temp with points market as bubbles
+abline(h=mean(Elecsales)) # the mean value of the time serie
+```
+ 
+Analysist
+
+ + Trend: Yes(Mean not constan across the time)
+ + sazonalyty: No (we are working with annual data)
+ + Outliers: No
+ + cycle: No
+ + variance: Constant
+
+## Rwanda Annual GDP
+
+```{r}
+#Import data
+RWGDP<-read_csv("https://www.dropbox.com/s/hn21pmpjruayl23/RWA_GDP_WORLD_bANK.csv?dl=1", skip=3)
+#Create a ts object
+RWGDP<-ts(RWGDP, start=1960, frequency=1)
+#inspect the ts object
+str(RWGDP)
+
+#Plot the data using plot.ts
+
+autoplot(RWGDP,xlab="Year",ylab="Annual Rwanda GDP 1960-2018") #time series plot of temp with points market as bubbles
+```
+
+## Dam levels for major and minor dams in the Western Cape water supply system. 2011-2019
+
+The Western Cape Water Supply System (WCWSS) is a complex water supply system in the Western Cape region of South Africa, comprising an inter-linked system of six main dams, pipelines, tunnels and distribution networks, and a number of minor dams, some owned and operated by the Department of Water and Sanitation and some by the City of Cape Town.[1]
+The principal dams are all located in the Cape Fold Mountains to the east of Cape Town are:
+
+* Theewaterskloof Dam;
+Wemmershoek Dam
+Steenbras Dams (Upper and lower)
+Voëlvlei Dam
+Berg River Dam
+These six major dams provide 99.6% of the combined storage capacity, and 8 minor dams the remaining 0.4%. The levels of these dams are recorded and published in weekly reports by the Department of Water and Sanitation.
+Water crisis 2015-present
+Beginning in 2015, a drought resulted in a severe water shortage in the area, with dam levels declining to critically low levels, and Cape Town announcing plans for "Day Zero", when municipal water supply would have to be shut off.[9] Water conservation and demand management was implemented, with increasingly severe water restrictions to both agriculture and urban use. Emergency augmentation measures including groundwater extraction from aquifers and desalination projects are underway.[10] Through water saving and augmentation measures, by March 2018 the City had reduced its daily water consumption by more than half to around 500 million litres per day, resulting in the initial prediction of Day Zero in April 2018 being pushed back to 2019. The situation, however, remains severe, particularly if the run of record dry winters continues through 2018.
+ 
+```{r}
+DamLevels<-read_csv("https://www.dropbox.com/s/0mj1dru4cn53jnj/Dam%20levels%202012%20to%202019.csv?dl=1")
+DamLevels<-column_to_rownames(DamLevels, var = "DATE")
+DamLevels<-xts(DamLevels, order.by =as.Date(rownames(DamLevels),format="%d-%b-%y") )
+tail(DamLevels)
+
+autoplot(DamLevels["2014-06/2019-09"],xlab="Time",ylab="Dailly Dam levels for major and minor dams in the Western Cape") #time series plot of temp with points market as bubbles
+#Trend - maybe, seasonality - yes, outlier - maybe
+#abline(h=mean(DamLevels))
+
+```
+ 
+Analysist
+
+ + Trend: Yes
+ + sazonality:No
+ + Outliers: No
+ + cycle: Yes
+ + variance:Constant
+
+
+##Daily closing Shoprite stock prices
+```{r}
+
+# Import Shoprite Holdings Limited SRGHY data from Yahoo! Finance
+getSymbols("SRGHY", auto.assign = TRUE)
+# Look at the structure of the object getSymbols created
+str(SRGHY)
+
+# Extract the close column
+ShopriteClose=Cl(SRGHY)
+
+
+#Plot 
+
+autoplot(ShopriteClose["2017/2019-08"],xlab="Time",ylab="Dailly Shoprite Stock Close Price (2017-08/2019)") #time series plot of temp with points market as bubbles
+#Trend - maybe, seasonality - yes, outlier - maybe
+
+```
+
+
+```{r}
+## Food Price
+rm(price)
+price<-read_csv("https://www.dropbox.com/s/kx58bp0kqoj6jht/Mozambique_foodprices.csv?dl=1", skip = 3)
+price<-price[,-c(1:16)]
+price<-column_to_rownames(price, var = "Date")
+price1<-xts(price, order.by =as.Date(rownames(price), "%m/%d/%Y"),unique = FALSE)
+head(price1)
+
+```
+ 
+Analysist
+
+ + Trend: Yes
+ + sazonalyty: 
+ + Outliers: No
+ + cycle:Yes
+ + variance: Non Constant
+
+
+## Bibliographic references
+
+
+@Manual{R-base,
+  title = {Using R for Time Series Analysis},
+  author = {{Avril Coghlan}},
+  url = {https://a-little-book-of-r-for-time-series.readthedocs.io/en/latest/src/timeseries.html#time-series-analysis},
+}
+
+@Manual{R-base,
+  title = {Forecasting: Principles and Practice},
+  author = {{Rob J Hyndman, George Athanasopoulos}},
+  organization = {Monash University},
+  address = {Austria},
+  year = {2016},
+  url = {https://otexts.com/fpp2/},
+}
+
+https://en.wikipedia.org/wiki/Western_Cape_Water_Supply_System

@@ -1,0 +1,57 @@
+Indicator,Indicator Description,2006,2005,2004,2003,2002,2001,2000,1999,1998,1997,1996
+Sales,"Total sold, GWh",208316,256959,206799,196980,1879573,1815113,1781933,1734123,1714573,1725503,1653703
+Sales,"Growth in GWh sales, %",18.9,30.5,5,4.8,3.5,1.8,2.8,1.1,0.6,4.3,7.7
+Electricity output,"Total electricity for Eskom system (Eskom stations and purchased), GWh",232295,285601,229970,218412,207233,198790,194601,188475,185583,187850,178884
+Electricity output,"Total produced by Eskom stations, GWh (net)",221216,273404,220152,210218,197737,189590,189307,181818,183093,187811,178855
+Electricity output,"Coal-fired stations, GWh (net)",205837,251914,202171,194046,181651,175223,172362,165665,165473,170464,163541
+Electricity output,"Hydroelectric stations, GWh (net)",1141,903,720,777,2357,2061,1343,726,1596,2092,1319
+Electricity output,"Pumped storage stations, GWh (net)",2867,3675,2981,2732,1738,1587,2591,2590,2420,2608,2220
+Electricity output,"Gas turbine stations, GWh (net)",78,,,,,,1,,3,,
+Electricity output,"Nuclear power station, GWh (net)",11293,16912,14280,12663,11991,10719,13010,12837,13601,12647,11775
+Electricity output,"Total purchased for Eskom system, GWh",10310,12197,9818,8194,9496,9200,5294,6657,2490,39,29
+Electricity output,"Total consumed by Eskom, GWh",3814,5043,4040,3664,2354,2177,3478,3507,3299,3511,3130
+Electricity output,"Total available for distribution, GWh",228480,280557,225929,214748,204879,196613,191123,184968,182284,184339,175754
+Plant performance indicators,"Total power station nominal capacity, MW",42011,42011,42011,42011,42011,42011,41298,40585,39872,39154,38497
+Plant performance indicators,"Total power station net maximum capacity, MW",39810,39810,39810,39810,39810,39810,39186,38517,37848,37175,36563
+Plant performance indicators,"Peak demand on integrated Eskom system, MW",33461,34195,34195,31928,31621,30599,29188,27813,27803,28329,27967
+Plant performance indicators,"Average energy availability EAF (UCF), %",87.4 (88.7),"89.5 (89,9) ",89.5 (90) ,87.5 (88.7),89.3(91.7) ,92.0(92.5),92.1(92.8),91.0(92.5),91.6(92.7),90.4(91.5) ,89.6(90.6)
+Plant performance indicators,"Generation load factor, %",69.7,69,69.2,66.3,62.3,59.8,60.6,61.2,61.6,65,63.9
+Plant performance indicators,"Integrated Eskom system load factor, %",79.8,78,77.4,76.8,74,73.4,74.7,75.9,74.8,74.3,71.5
+Environmental indicators,"Relative particulate emissions, kg/MWh sent out",0.21,0.26,0.27,0.28,0.29,0.31,0.35,0.37,0.36,0.44,0.63
+Environmental indicators,"Specific water consumption, l /kWh sent out",1.32,1.27,1.26,1.29,1.27,1.26,1.21,1.25,1.23,1.2,1.21
+Environmental indicators,"Reported legal contraventions counted in the operational sustainability index, number",1,3,2,2,3,2,3,9,9,15,11
+Environmental indicators,"Customer satisfaction (PreCare/MaxiCare), ratio",,8.29,8.31,8.47,8.57,8.43,8.82,8.78,8.9,9.1,8.72
+Environmental indicators,"Customer satisfaction (Enhanced PreCare/MaxiCare), ratio",101.06,93.1,,,,,,,,,
+Environmental indicators,"Net raw water consumption, Ml",291516,347135,277557,271940,251611,239233,228759,227288,225280,225699,216131
+Environmental indicators,"Coal burnt, kt",112096,136437,109508,104370,96460,94136,92454,88470,87225,90169,85401
+Environmental indicators,"Average calorific value, MJ/kg",19.58,19.36,19.42,19.41,19.54,19.42,19.5,19.53,19.84,19.68,19.83
+Environmental indicators,"Average ash content, %",29.1,29.6,29.6,28.9,28.4,28.8,28.6,28.5,29.1,28.4,27.8
+Environmental indicators,"Average sulphur content, %",0.88,0.87,0.87,0.92,0.92,0.93,0.9,0.96,0.93,0.94,0.97
+Environmental indicators,"Overall thermal efficiency, %",33.8,34,34,34.2,34.1,34.1,34.4,34.4,34.2,34.5,34.5
+Environmental indicators,"Line losses, %",8.2,8.2,7.8,8.3,8.2,7.2,7.4,6.2,5.9,6.4,5.9
+Environmental indicators,"Nitrous oxide (N2O), t",3134,3552,2924,2580,2246,2154,2093,2010,2031,2085,2004
+Environmental indicators,"Carbon dioxide (CO2), Mt",203.7,247,197.7,190.1,175.2,169.3,161.2,159.4,163.2,169,158.6
+Environmental indicators,"Sulphur dioxide (SO2), kt",1763,2236,1779,1728,1494,1500,1505,1506,1583,1383,1295
+Environmental indicators,"Nitrogen oxide (NOx) as NO2, kt",877,994,797,760,702,684,674,673,669,688,647
+Environmental indicators,"Particulate emissions, kt",45.76,72.83,59.17,58.65,57.53,59.64,66.08,67.08,65.21,83.43,112.11
+Environmental indicators,"Ash produced, Mt",33.4,40.8,33.1,29.8,26.2,26.5,24.6,24.3,24.7,23.7,22.2
+Environmental indicators,"Ash sold, Mt",1.789,1.957,1.59,1.197,1.257,1.161,1.126,1.116,1.18,1.118,0.995
+Environmental indicators,"Radiation release, mSv",,,,,0.0005,0.0007,0.0005,0.0005,0.0007,0.0008,0.0008
+Environmental indicators,"Radiation release, mSv",0.0049,0.0079,0.0087,0.0123,0.006,0.0192,0.0059,0.0112,0.0088,0.0122,0.0156
+Environmental indicators,"Low-level waste- steel drums, cubic metres",91.3,282.5,258.8,86.9,89.04,117.25,72.8,70.77,61.18,89.95,109.06
+Environmental indicators,"Intermediate-level waste- concrete drums, cubic metres",52.4,114.5,97.5,37.4,30.21,45.65,22.1,37.11,22.77,26.26,35.35
+Environmental indicators,"Low-level nuclear waste- fuel racks, cubic metres",,697,697,,,,,,,,
+Environmental indicators,"Spent nuclear fuel, number of elements (cumulative figure)",52 (1505),104 (1453) ,56 (1405) ,104 (1349),48 (1245) ,104 (1197) ,52 (1093),104 (1041),52 (937),104 (885),104 (781)
+Employees,Total number at year end,29697,29845,28396,28938,29359,29969,32832,34027,37311,39241,39857
+Employees,GWh sold per employee,7.015,8.854,7.283,6.807,6.402,6.054,5.427,5.096,4.595,4.397,4.149
+"Sales to countries in southern Africa, GWh",Total,13122,16008,12954,10173,6956,6710,3872,3884,4093,6439,5554
+"Sales to countries in southern Africa, GWh",Botswana,1727,2111,1699,1390,1124,1183,986,934,689,748,685
+"Sales to countries in southern Africa, GWh",Mozambique,8167,10108,8076,5875,3907,3899,1331,68,385,680,596
+"Sales to countries in southern Africa, GWh",Namibia,1709,1821,1515,1114,598,578,640,562,602,1295,1100
+"Sales to countries in southern Africa, GWh",Zimbabwe,549,598,532,793,298,371,788,1564,1521,2790,2267
+"Sales to countries in southern Africa, GWh",Lesotho,23,13,12,38,16,40,12,55,209,318,335
+"Sales to countries in southern Africa, GWh",Swaziland,760,872,697,796,799,639,115,701,687,608,571
+"Sales to countries in southern Africa, GWh",Zambia,187,465,403,151,103,,,,,,
+"Sales to countries in southern Africa, GWh",Short-term energy market,,20,20,16,111,,,,,,
+,,,,,,,,,,,,
+,Botswana,Mozambique,Namibia,Zimbabwe,Lesotho,Swaziland,Zambia,,,,,

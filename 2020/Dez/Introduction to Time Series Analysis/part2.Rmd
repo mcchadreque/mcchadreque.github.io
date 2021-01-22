@@ -1,0 +1,134 @@
+---
+title: "Time Series Analysis Part 1"
+author: "Manuela da Cruz Chadreque"
+date: "25 de Abril de 2019"
+output:
+  html_document:
+    keep_md: yes
+    number_sections: yes
+    theme: journal
+  word_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+```{r eval=FALSE, include=FALSE}
+setwd("C:/Users/maiam/Dropbox/PROFESSIONAL DEVELOPMENT/DATA SCIENCE/01_R/TIME SERIES ANALYSIS/Introduction to Time Series Analysis")
+```
+
+## Time Series  Exploratory Analysis
+
+
+##simple Forecasting Methods
+###Average Method
+The forecast of all future values are equal to the mean 
+$$ \hat{x}_{n+k|n}=\bar{x}=\frac{x_1+x_2+...+x_n}{n} $$
+
+###Naive method
+Forecasts equal to last observed value 
+ $$ \hat{x}_{n+k|n}=x_n $$
+###Seasonal naive method
+Forecasts equal to last value from same season. 
+$$ \hat{x}_{n+k|n}=x_{n+k-lm} $$
+where: 
+m is the seasonal period
+$$I= \frac{(k-1)}{m} +1$$
+ Drift method 
+Forecasts equal to last value plus average change. Equivalent extrapolating a line drawn between first and last observations.
+
+$$ \hat{x}_{n+k|n}=x_{n}+ \frac{(k-1)}{m} \sum_{i=2}^n{x_t-x_{t-1}}=x_n+\frac{k}{n-1}(x_n-x_1) $$
+##Decomposition methods
+Decomposition methods are based in the decomposition of three movements or strengths: **trend**, **seasonality** and **noise**:  
+
+$$X_t=f(T_t,S_t,e_t)$$
+##ARIMA models (Autoregressive Integrated Moving Average) 
+Models that relate the present value of a series to past values and past prediction errors
+
+###Temperatures
+```{r}
+plot.ts(window(x=ts.temp),type="b",xlab="Time",ylab="Temperatures", xlim=c(2014,2018))
+lines(meanf(window(ts.temp),h=24)$mean,col=2,lwd=3)
+lines(naive(window(ts.temp),h=24)$mean,col=3,lwd=3)
+lines(snaive(window(ts.temp),h=24)$mean,col=4,lwd=3)
+lines(rwf(window(ts.temp),drift=T,h=24)$mean,col=5,lwd=3)
+text<-c("Mean method","Naive method", "Seasonal naive method", "Drift method")
+legend("topright",text,col=2:5,lty=1,ncol=1,cex=1,lwd=3)
+```
+ 
+analysis
+
+```{r}
+plot.ts(window(bricksq),type="b",xlab="Time",ylab="Quarterly production of bricks (in millions of units) at Portland, Australia") 
+lines(meanf(window(bricksq),h=24)$mean,col=2,lwd=3)
+lines(naive(window(bricksq),h=24)$mean,col=3,lwd=3)
+lines(snaive(window(bricksq),h=24)$mean,col=4,lwd=3)
+lines(rwf(window(bricksq),drift=T,h=24)$mean,col=5,lwd=3)
+text<-c("Mean method","Naive method", "Seasonal naive method", "Drift method")
+legend("topright",text,col=2:5,lty=1,ncol=1,cex=1,lwd=3)
+```
+ 
+analysis
+
+
+###Annual Electric Sales for South Australia in GWh
+```{r}
+plot.ts(window(elecsales),type="b",xlab="Time",ylab="Annual Electric Sales for South Australia in GWh")
+lines(meanf(window(elecsales),h=24)$mean,col=2,lwd=3)
+lines(naive(window(elecsales),h=24)$mean,col=3,lwd=3)
+lines(snaive(window(elecsales),h=24)$mean,col=4,lwd=3)
+lines(rwf(window(elecsales),drift=T,h=24)$mean,col=5,lwd=3)
+text<-c("Mean method","Naive method", "Seasonal naive method", "Drift method")
+legend("topright",text,col=2:5,lty=1,ncol=1,cex=1,lwd=3)
+```
+ 
+analysis
+
+
+
+###Monthly sales of new one-family houses sold in the USA
+
+```{r}
+plot.ts(window(hsales, start=1973, end=1995),type="b",xlab="Time",ylab="Monthly sales of new one-family houses sold in the USA") #time series plot of temp with points market as bubbles
+
+lines(meanf(window(hsales),h=24)$mean,col=2,lwd=3)
+lines(naive(window(hsales),h=24)$mean,col=3,lwd=3)
+lines(snaive(window(hsales),h=24)$mean,col=4,lwd=3)
+lines(rwf(window(hsales),drift=T,h=24)$mean,col=5,lwd=3)
+text<-c("Mean method","Naive method", "Seasonal naive method", "Drift method")
+legend("topright",text,col=2:5,lty=1,ncol=1,cex=1,lwd=3)
+```
+ 
+analysis
+
+ Daily closing IBM stock prices
+```{r}
+plot.ts(window(ibmclose),type="b",xlab="Time",ylab="Daily closing IBM stock prices", xlim=c(1, 379)) #time series plot of temp with points market as bubbles
+
+lines(meanf(window(ibmclose),h=24)$mean,col=2,lwd=3)
+lines(naive(window(ibmclose),h=24)$mean,col=3,lwd=3)
+lines(snaive(window(ibmclose),h=24)$mean,col=4,lwd=3)
+lines(rwf(window(ibmclose),drift=T,h=24)$mean,col=5,lwd=3)
+text<-c("Mean method","Naive method", "Seasonal naive method", "Drift method")
+legend("topright",text,col=2:5,lty=1,ncol=1,cex=1,lwd=3)
+
+```
+ 
+References
+
+
+@Manual{R-base,
+  title = {Using R for Time Series Analysis},
+  author = {{Avril Coghlan}},
+  url = {https://a-little-book-of-r-for-time-series.readthedocs.io/en/latest/src/timeseries.html#time-series-analysis},
+}
+
+@Manual{R-base,
+  title = {Forecasting: Principles and Practice},
+  author = {{Rob J Hyndman, George Athanasopoulos}},
+  organization = {Monash University},
+  address = {Austria},
+  year = {2016},
+  url = {https://otexts.com/fpp2/},
+}
+

@@ -1,0 +1,392 @@
+library('fpp')
+library("astsa")
+
+#===================================================================
+#Exercise 1
+#===================================================================
+x<-dj
+x
+#or: 
+y<-read.table('DJ.csv',header=TRUE, sep=',')
+y<-ts(y)
+y
+#(1)
+plot.ts(y)
+#Second cycle of growing pattern#
+
+#(2)
+x.dif<-diff(y)
+plot(x.dif)
+
+acf(x.dif) # White noise#
+
+#(3)
+forecast<-rwf(x.dif, drift=TRUE, h=4)
+forecast
+res<-residuals(forecast)
+
+#(4)
+plot.ts(window(x.dif),xlab="Time",ylab="Daily closing DJ stock prices", xlim=c(1, 295)) #time series plot of temp with points market as bubbles lines(rwf(window(x.dif),drift=T,h=4)$mean,col=5,lwd=3)
+
+#===================================================================
+#Exercise 2
+#===================================================================
+berk=scan("berkeley.txt",what=list(double(0),double(0),double(0)))
+berkeley=ts(berk[[2]])
+berkeley
+#(1)
+plot(berkeley)
+#trend: yes, seasonality: no, ouliers: maybe one, stationatity: seems not to be, because mean does not seem constant and variance seems constant.#
+#(2)
+dberk=diff(berkeley) 
+plot(dberk)
+#(3)
+par(mfrow=c(1,2))
+acf(dberk) 
+pacf(dberk)
+#(4)
+fit1=arima(berkeley,order=c(0,1,1))
+fit1
+acf(fit1$residuals)
+qqnorm(fit1$residuals)
+qqline(fit1$residuals)
+
+#(5)
+#Yes. Residuals are white noise and parameter estimates of the model are statistically different from zero#
+
+
+#===================================================================
+#Exercise 3
+#===================================================================
+grain=scan("grain.txt")
+grain=ts(grain)
+
+#(1)
+plot.ts(grain)
+abline(h=mean(grain))
+#trend: no, seasonality: no, ouliers: no, stationatity: seems to be, because both mean and variance seem constant.#
+
+#(2)
+acf(grain)
+pacf(grain)
+# it can be a MA(1) and/or AR(1)
+
+#(3)
+AR1<-arima(grain, order=c(1,0,0))
+AR1
+tsdiag(AR1)
+
+MA1<-arima(grain,order=c(0,0,1))
+MA1
+tsdiag(MA1)
+
+ARMA1<-arima(grain, order=c(1,0,1))
+ARMA1
+tsdiag(ARMA1)
+
+#(4)
+#AR1, because has lower AIC than MA1. The estimate of the MA1 on the ARMA1 is not statistically significant, and therefore this should not be choosen.
+
+#(5)
+forecasts <- forecast(AR1, h=4)
+forecasts
+plot.forecast(forecasts)
+
+#===================================================================
+#Exercise 4
+#===================================================================
+
+data(usconsumption)
+consump<-usconsumption[,1] #to get only consumption 
+consump
+#or:
+consump1<-read.table('USconsumption.csv',header=TRUE, sep=',')
+consump1<-consump1[,1]
+consump1<-ts(consump,start=1970, frequency=4)
+consump1
+
+#(1)
+plot.ts(consump1)
+#trend: no, seasonality: no, ouliers: maybe one, stationatity: seems to be, because both mean and variance seem constant.#
+
+#(2)
+acf(consump1)
+#seems consistent with a MA(3) model
+auto.arima(consump1)
+#(3)
+fit<-arima(consump1,order=c(0,0,3))
+fit
+acf(fit$res)
+plot(fit$res)
+abline(h=(mean(fit$res)))
+hist(fit$res)
+
+#(4)
+#Yes. Residuals are white noise and parameter estimates of the model are statistically different from zero#
+
+#===================================================================
+#Exercise 5
+#===================================================================
+income<-usconsumption[,2] #to get only income 
+income
+#or
+income<-consump[,2]
+income<-ts(income, start=1970, frequency=4)
+income
+#(1)
+plot.ts(income)
+abline(h=mean(income))
+#trend: no, seasonality: no, ouliers: maybe a couple, stationatity: seems to be, because both mean and variance seem constant.#
+
+#(2)
+acf(income)
+pacf(income)
+#seems consistent with white noise.
+
+#(3)
+forecast<-meanf(income)
+forecast
+res<-residuals(meanf(income))
+Acf(res)
+hist(res)
+
+#(4)
+#Yes. Because the residuals are white noise.
+
+#===================================================================
+#Exercise 6
+#===================================================================
+x<-read.csv("volcano.csv", header=TRUE)
+
+#(1)
+volcanodustseries<-ts(x, start=c(1869))
+plot.ts(volcanodustseries)
+#very hard to see anything. So, therefore will look for possible models using acf and pacf#
+
+#(2)
+acf(volcanodustseries) # exponentially decay to zero, which can indicate a need of diferencing.#
+pacf(volcanodustseries) #Spikes at lag 1, which cleary indicates a AR(1) model.#
+
+#(3)
+volcanodustseriesarima <- arima(volcanodustseries, order=c(1,0,0))
+volcanodustseriesarima 
+#x_t=96.3626*(1-0.6580)+0.6580x_t-1+w_t
+
+#(4)
+The parameter estimatiors are statistically different from zero.
+
+#(5)
+acf(volcanodustseriesarima$res) #consistent with white noise
+plot(as.vector(fitted(volcanodustseriesarima)),as.vector(residuals(volcanodustseriesarima)))
+#Residuals see to be white noise, and seem to be indepedent of the variable.#
+
+#(6)
+Box.test(volcanodustseriesarima$residuals, lag=20, type="Ljung-Box")
+#The p value is above 0.05, so there is no indications of accumulated residual correlation
+
+#(7)
+volcanodustseriesarima_2<- arima(volcanodustseries, order=c(1,0,2))
+volcanodustseriesarima_2
+#We should use as less parameters as possible. The AR(1) is better. None of the MA(2) parameter estimators are statistically different from zero.#
+
+#(8)
+volcanodustseriesforecasts <- forecast(volcanodustseriesarima_2, h=3)
+volcanodustseriesforecasts
+plot.forecast(volcanodustseriesforecasts)
+
+#due to the extreme variability of the series and the existence of several zeros, forecast intervals are extremelly high. A better solution should be found#
+
+#===================================================================
+#Exercise 7
+#===================================================================
+mydata<-read.csv2("Oil.csv", header=F , dec=".")
+data.ts<-ts(mydata[,1], start=1965, frequency=1)
+#(1)
+plot(data.ts)
+#Trend - yes, Cyclic - yes, Seasonality - No. No stationarity.#
+
+#(2)
+acf(data.ts)
+Acf(data.ts)$acf
+#############################################
+The ACF of an AR model decay exponentially to zero. It seems to be the case of this one. In terms of values we would expect that:
+rho2=.87076860^2
+which is pretty close to 0.71
+rho3=.87076860^3
+which is a big far away from the 0.543. So it may be an AR model but we do not know the order.
+The ACF is helpful in determining the order of an MA model. In this case it can be representing an MA(4) model.
+############################################# 
+
+#(3)
+fit.ar1 <- Arima(data.ts, order=c(1,0,0))
+fit.ar1
+plot(residuals(fit.ar1)) # plot of the residuals: the ideal for this plot is an horizontal band of points around zero
+abline(h=0)
+abline(h=mean(residuals(fit.ar1)),col="blue") #The residuals do not have a zero mean which may indicate a non stationary series. We knew this because the series seemed to have a positive trend
+acf(residuals(fit.ar1)) # The ideal for this is that all lags have non-statistical values 
+plot(as.vector(fitted(fit.ar1)),as.vector(residuals(fit.ar1)),xlab="Predicted scores", ylab="Residuals")#plot of the residuals versus fitted: the ideal for this plot is an horizontal band of points
+phy1<-fit.ar1$coef[1]
+phy1
+delta<-fit.ar1$coef[2]*(1-fit.ar1$coef[1])
+delta
+# The model is x_t=19.39586 + 0.9424404 x_t-1 + w_t
+
+#(4)
+#Based on the residuals we may say that AR(1) could be one of the options, but others would need to be tested.
+
+#===================================================================
+#Exercise 8
+#===================================================================
+#(1)
+cmort
+
+diff.c <- diff(cmort)
+par(mfrow=c(2,1))
+plot(cmort)
+plot(diff.c)
+
+#The original time series seems to have a trend (evident in the acf below) and some seasonality. Differencing the data eliminates some of that non-stationarity (see the acf below).
+acf(cmort)
+acf(diff.c)
+
+#(2)
+Acf(diff.c, lag.max=10 ,main="ACF")$acf
+Acf(diff.c, lag.max=10 ,main="ACF")
+Pacf(diff.c, lag.max=10, main="PACF")
+# The acf declines geometrically to zero and the lag 2 of the pacf is zero. An AR(1) seems appropriate. 
+
+#(3)
+fit.ar1 <- Arima(diff.c,c(1,0,0))
+fit.ar1 
+
+ar1sig<-ifelse(-fit.ar1$coef[1]/0.0383>qnorm(0.975), "significant", "non significant")
+ar1sig
+intsig<-ifelse(-fit.ar1$coef[2]/0.1715>qnorm(0.975), "significant", "non significant")
+intsig 
+
+# the white noise variance is the one presented in the output as sigma^2 estimate 
+
+#(4)
+tsdiag(fit.ar1)
+plot(as.vector(fitted(fit.ar1)),as.vector(residuals(fit.ar1)),xlab="Fitted values", ylab="Residuals")
+abline(h=0)
+Box.test(residuals(fit.ar1), lag=12, fitdf=2, type="Ljung")
+
+#All diagnoses point to a white noise process for the rsiduals.
+
+#===================================================================
+#Exercise 9
+#===================================================================
+mydata<-read.csv2("OilPrice.csv", header=F , dec=".")
+oil.price<-ts(mydata[,1], start=1986, frequency=12)
+
+#(1)
+plot(oil.price)
+monthplot(oil.price)
+BoxCox.lambda(oil.price)
+# A trend is evident in the series. Seasonality - yes. Outliers - Maybe one between 90 and 95. Variance is not constant (lambda is not close to 1).
+Differecing and Power transformations would be aplicable#
+
+#(2)
+diff.op<-(diff(oil.price))
+plot(diff.op,main="Graph of the First differences")
+
+#The series seems to have now a constant mean, but it can be seen that the variance is not constant. We have not yet treated that part. This is still not a stationary series.
+
+#(3)
+par(mfrow=c(2,1))
+Acf(oil.price)
+pacf(oil.price)
+#The need of the differecing is again evident on the ACF. The PACF shows a possibility to use an AR(1).
+
+par(mfrow=c(2,1))
+Acf(diff.op,main="ACF of the diff series")$acf
+pacf(diff.op,main="PACF of the diff series")$acf
+#Both the ACF and the PACF show many lag with values of autocorrelation outside the critical area.
+
+new.op<-(diff(log(oil.price)))
+par(mfrow=c(2,1))
+Acf(new.op,main="ACF of the differenciated log series")
+pacf(new.op,main="PACF of the differenciated log series")
+#The results are must clear now. An MA(1) or a AR(2) could be considered. Or even an ARIMA(2,0,1).
+
+#(4)
+Ma1<-arima(new.op,order=c(0,0,1))
+Ma1
+
+ma1sig<-ifelse(Ma1$coef[1]/0.0696>qnorm(0.975), "significant", "non significant")
+ma1sig
+intsig<-ifelse(Ma1$coef[2]/0.0068>qnorm(0.975), "significant", "non significant")
+intsig 
+
+plot(as.vector(fitted(Ma1)),as.vector(residuals(Ma1)),xlab="Predicted scores", ylab="Residuals")
+abline(h=0)
+tsdiag(Ma1)
+Box.test(residuals(fit.ar1), lag=12, fitdf=2, type="Ljung")
+#The model seems to be satisfactory. Theta 1 is significantly different from zero and the residuals resemble white noise.
+
+#(5)
+AR1<-arima(new.op,order=c(1,0,0))
+AR4<-arima(new.op,order=c(4,0,0))
+Ma1
+AR1
+AR4
+# Both AR(1) and MA(1) seem acceptable. All coeeficient estimates are statistically different from zero. AIC are almost identical with a small advantage to AR(1). For the AR(4) 3rd and 4rd coefficients are not significantly diff from 0
+
+tsdiag(AR1)
+tsdiag(Ma1)
+Box.test(residuals(AR1), lag=12, fitdf=2, type="Ljung")
+Box.test(residuals(Ma1), lag=12, fitdf=2, type="Ljung")
+#Both residuals resemble white noise.
+
+#===================================================================
+#Exercise 10
+#===================================================================
+so2
+
+
+#(1)
+par(mfrow=c(2,1))
+plot(so2,main="Plot of so2")
+acf(so2)
+#The time series show a strong trend.
+monthplot(so2)
+#The seasonality is present but we will not considered it now
+BoxCox.lambda(so2)
+#The variance does not seem to be constant
+#The time series that we will use is:
+plot(diff(log(so2)),main="Differenciated Log plot of so2")
+acf(diff(log(so2)))
+#Seems now to be stationary.
+
+stat.so2 <- diff(log(so2))# Trend and change in variance
+par(mfrow=c(2,1))
+acf(stat.so2,main="ACF")
+pacf(stat.so2,main="PACF")
+
+#The ACF have 3 spikes and the PACF decay geometrically to zero. Let's try and MA(2), and AR(2)(to test the AR part) and an ARIMA(2,0,2)
+
+MA2<- Arima(stat.so2,order=c(0,0,2))
+MA2
+# As the 2rd coefficient is not statistically different from zero let's change to an MA(1)
+MA1<- Arima (stat.so2, order=c(0,0,1))
+MA1
+
+AR2 <- Arima(stat.so2,order=c(2,0,0))
+AR2
+#All the coefficient estimates are statistically different from zero.
+
+ARMA21 <- Arima(stat.so2,order=c(2,0,1))
+ARMA21
+#All the coefficient estimates are statistically different from zero. Let's check the residuals.
+
+tsdiag(ARMA21)
+Box.test(residuals(ARMA21), lag=12, fitdf=0, type="Ljung")
+
+#Residuals are white noise. We can proceed to forecasting
+
+#(2)
+forecast(ARMA21,h=4)
+#We will need to back transform the data into the original values to get the forecast. 
+exp(0.123557388) This is value that needs to be added to the last data point to find the forecast of one point ahead forecast. 
+ 

@@ -1,0 +1,737 @@
+---
+title: "Introduction to Time Series Analysis"
+author: "Manuela da Cruz Chadreque"
+date: "12 de Março de 2019"
+output: 
+  html_document: 
+    theme: cerulean
+    toc: yes
+---
+
+![Statement of Accomplishment][https://www.datacamp.com/statement-of-accomplishment/course/e927e0bd07d8ed57ac6a42f0a3e5c808157a2ed0]
+```{r}
+setwd("C:/Users/maiam/Dropbox/PROFESSIONAL DEVELOPMENT/DATA SCIENCE/01_R/TIME SERIES ANALYSIS/Introduction to Time Series Analysis")
+```
+##1. Exploratory time series data analysis
+
+###Exploring raw time series
+The most common first step when conducting time series analysis is to display your time series dataset in a visually intuitive format. The most useful way to view raw time series data in R is to use the print() command, which displays the Start, End, and Frequency of your data along with the observations.
+
+Another useful command for viewing time series data in R is the length() function, which tells you the total number of observations in your data.
+
+Some datasets are very long, and previewing a subset of data is more suitable than displaying the entire series. The head(___, n =___) and tail(___, n =___) functions, in which n is the number of items to display, focus on the first and last few elements of a given dataset respectively.
+
+In this exercise, you'll explore the famous River Nile annual streamflow data, Nile. This time series dataset includes some metadata information. When calling print(Nile), note that Start = 1871 indicates that 1871 is the year of the first annual observation, and End = 1970 indicates 1970 is the year of the last annual observation.
+
+```{r}
+# Print the Nile dataset
+print(Nile)
+
+# List the number of observations in the Nile dataset
+length(Nile)
+
+# Display the first 10 elements of the Nile dataset
+head(Nile, n=10)
+
+# Display the last 12 elements of the Nile dataset
+tail(Nile,n=12)
+
+```
+Basic time series plots
+While simple commands such as print(), length(), head(), and tail() provide crucial information about your time series data, another very useful way to explore any data is to generate a plot.
+
+In this exercise, you will plot the River Nile annual streamflow data using the plot() function. For time series data objects such as Nile, a Time index for the horizontal axis is typically included. From the previous exercise, you know that this data spans from 1871 to 1970, and horizontal tick marks are labeled as such. The default label of "Time" is not very informative. Since these data are annual measurements, you should use the label "Year". While you're at it, you should change the vertical axis label to "River Volume (1e9 m^{3})".
+
+Additionally, it helps to have an informative title, which can be set using the argument main. For your purposes, a useful title for this figure would be "Annual River Nile Volume at Aswan, 1871-1970".
+
+Finally, the default plotting type for time series objects is "l" for line. Connecting consecutive observations can help make a time series plot more interpretable. Sometimes it is also useful to include both the observations points as well as the lines, and we instead use "b" for both.
+
+```{r}
+# Plot the Nile data
+plot(Nile)
+
+# Plot the Nile data with xlab and ylab arguments
+plot(Nile, xlab = "Year", ylab = "River Volume (1e9 m^{3})")
+
+# Plot the Nile data with xlab, ylab, main, and type arguments
+plot(Nile, xlab = "Year", ylab = "River Volume (1e9 m^{3})",main = "Annual River Nile Volume at Aswan, 1871-1970", type ="b")
+```
+
+**sampling frequency**
+Identifying the sampling frequency
+In addition to viewing your data and plotting over time, there are several additional operations that can be performed on time series datasets.
+
+The start() and end() functions return the time index of the first and last observations, respectively. The time() function calculates a vector of time indices, with one element for each time index on which the series was observed.
+
+The deltat() function returns the fixed time interval between observations and the frequency() function returns the number of observations per unit time. Finally, the cycle() function returns the position in the cycle of each observation.
+
+In this exercise, you'll practice applying these functions to the AirPassengers dataset, which reports the monthly total international airline passengers (in thousands) from 1949 to 1960.
+```{r}
+# Plot AirPassengers
+plot(AirPassengers)
+
+# View the start and end dates of AirPassengers
+start(AirPassengers)
+end(AirPassengers)
+
+# Use time(), deltat(), frequency(), and cycle() with AirPassengers 
+
+time(AirPassengers)
+deltat(AirPassengers)
+frequency(AirPassengers)
+cycle(AirPassengers)
+
+```
+
+Missing values
+Sometimes there are missing values in time series data, denoted NA in R, and it is useful to know their locations. It is also important to know how missing values are handled by various R functions. Sometimes we may want to ignore any missingness, but other times we may wish to impute or estimate the missing values.
+
+Let's again consider the monthly AirPassengers dataset, but now the data for the year 1956 are missing. In this exercise, you'll explore the implications of this missing data and impute some new data to solve the problem.
+
+The mean() function calculates the sample mean, but it fails in the presence of any NA values. Use mean(___, na.rm = TRUE) to calculate the mean with all missing values removed. It is common to replace missing values with the mean of the observed values. Does this simple data imputation scheme appear adequate when applied the the AirPassengers dataset?
+
+```{r}
+
+# Plot the AirPassengers data
+plot(AirPassengers)
+
+# Compute the mean of AirPassengers
+
+mean(AirPassengers)
+# Impute mean values to NA in AirPassengers
+AirPassengers[85:96] <- mean(AirPassengers, na.rm =TRUE )
+
+# Generate another plot of AirPassengers
+plot(AirPassengers)
+
+# Add the complete AirPassengers data to your plot
+rm(AirPassengers)
+points(AirPassengers, type = "l", col = 2, lty = 3)
+
+```
+
+####Creating a time series object with ts()
+The function ts() can be applied to create time series objects. A time series object is a vector (univariate) or matrix (multivariate) with additional attributes, including time indices for each observation, the sampling frequency and time increment between observations, and the cycle length for periodic data. Such objects are of the ts class, and represent data that has been observed at (approximately) equally spaced time points. Now you will create time series objects yourself.
+
+The advantage of creating and working with time series objects of the ts class is that many methods are available for utilizing time series attributes, such as time index information. For example, as you've seen in earlier exercises, calling plot() on a ts object will automatically generate a plot over time.
+
+In this exercise, you'll familiarize yourself with the ts class by encoding some time series data (saved as data_vector) into ts and exploring the result. Your time series data_vector starts in the year 2004 and has 4 observations per year (i.e. it is quarterly data).
+```{r}
+data_vector<-c(2.0521941073,4.2928852797,3.3294132944,3.5085950670,0.0009576938,1.9217186345,0.7978134128,0.2999543435,0.9435687536,0.5748283388,-0.0034005903,0.3448649176,2.2229761136,0.1763144576,2.7097622770,1.2501948965,-0.4007164754,0.8852732121,-1.5852420266,-2.2829278891,-2.5609531290,-3.1259963754,-2.8660295895,-1.7847009207,-1.8894912908,-2.7255351194,-2.1033141800,-0.0174256893,-0.3613204151,-2.9008403327,-3.2847440927,-2.8684594718,-1.9505074437,-4.8801892525,-3.2634605353,-1.6396062522,-3.3012575840,-2.6331245433,-1.7058354022,-2.2119825061,-0.5170595186,0.0752508095,-0.8406994716,-1.4022683487,-0.1382114230,-1.4065954703,-2.3046941055,1.5073891432,0.7118679477,-1.1300519022)
+# Use print() and plot() to view data_vector
+print(data_vector)
+plot(data_vector)
+
+# Convert data_vector to a ts object with start = 2004 and frequency = 4
+time_series <- ts(data_vector,start=2004,frequency=4)
+
+# Use print() and plot() to view time_series
+print(time_series)
+plot(time_series)
+
+```
+####Testing whether an object is a time series
+When you work to create your own datasets, you can build them as ts objects. Recall the dataset data_vector from the previous exercise, which was just a vector of numbers, and time_series, the ts object you created from data_vector using the ts() function and information regarding the start time and the observation frequency. As a reminder, data_vector and time_series are shown in the plot on the right.
+
+When you use datasets from others, such as those included in an R package, you can check whether they are ts objects using the is.ts() command. The result of the test is either TRUE when the data is of the ts class, or FALSE if it is not.
+
+In this exercise, you'll explore the class of the datasets you've been using throughout this chapter.
+```{r}
+# Check whether data_vector and time_series are ts objects
+is.ts(time_series)
+is.ts(data_vector)
+
+# Check whether Nile is a ts object
+is.ts(Nile)
+
+# Check whether AirPassengers is a ts object
+
+is.ts(AirPassengers)
+
+```
+
+####Plotting a time series object
+It is often very useful to plot data we are analyzing, as is the case when conducting time series analysis. If the dataset under study is of the ts class, then the plot() function has methods that automatically incorporate time index information into a figure.
+
+Let's consider the eu_stocks dataset (available in R by default as EuStockMarkets). This dataset contains daily closing prices of major European stock indices from 1991-1998, specifically, from Germany (DAX), Switzerland (SMI), France (CAC), and the UK (FTSE). The data were observed when the markets were open, so there are no observations on weekends and holidays. We will proceed with the approximation that this dataset has evenly spaced observations and is a four dimensional time series.
+
+To conclude this chapter, this exercise asks you to apply several of the functions you've already learned to this new dataset
+```{r}
+# Check whether eu_stocks is a ts object
+eu_stocks<-EuStockMarkets
+is.ts(eu_stocks)
+
+# View the start, end, and frequency of eu_stocks
+start(eu_stocks)
+end(eu_stocks)
+frequency(eu_stocks)
+
+# Generate a simple plot of eu_stocks
+plot(eu_stocks)
+
+# Use ts.plot with eu_stocks
+ts.plot(eu_stocks, col = 1:4, xlab = "Year", ylab = "Index Value", main = "Major European Stock Indices, 1991-1998")
+
+# Add a legend to your ts.plot
+legend("topleft", colnames(eu_stocks), lty = 1, col = 1:4, bty = "n")
+
+```
+####Trend Spotting!
+####Removing trends in variability via the logarithmic transformation
+The logarithmic function log() is a data transformation that can be applied to positively valued time series data. It slightly shrinks observations that are greater than one towards zero, while greatly shrinking very large observations. This property can stabilize variability when a series exhibits increasing variability over time. It may also be used to linearize a rapid growth pattern over time.
+
+The time series rapid_growth has already been loaded, and is shown in the figure on the right. Note the vertical range of the data.
+
+```{r}
+rapid_growth<-read.csv("rapid_growth.csv")
+rapid_growth<-ts(rapid_growth)
+is.ts(rapid_growth)
+# Log rapid_growth
+linear_growth <-log(rapid_growth)
+  
+# Plot linear_growth using ts.plot()
+ ts.plot(linear_growth)
+ 
+```
+####Removing trends in level by differencing
+The first difference transformation of a time series z[t] consists of the differences (changes) between successive observations over time, that is z[t]???z[t???1].
+
+Differencing a time series can remove a time trend. The function diff() will calculate the first difference or change series. A difference series lets you examine the increments or changes in a given time series. It always has one fewer observations than the original series.
+
+The time series z has already been loaded, and is shown in the figure on the right.
+```{r}
+z<-read.csv("z.csv")
+z<-ts(z)
+# Generate the first difference of z
+dz <- diff(z)
+  length(z)
+# Plot dz
+ts.plot(dz)
+
+# View the length of z and dz, respectively
+length(z)
+length(dz)
+
+```
+####Removing seasonal trends with seasonal differencing
+For time series exhibiting seasonal trends, seasonal differencing can be applied to remove these periodic patterns. For example, monthly data may exhibit a strong twelve month pattern. In such situations, changes in behavior from year to year may be of more interest than changes from month to month, which may largely follow the overall seasonal pattern.
+
+The function diff(..., lag = s) will calculate the lag s difference or length s seasonal change series. For monthly or quarterly data, an appropriate value of s would be 12 or 4, respectively. The diff() function has lag = 1 as its default for first differencing. Similar to before, a seasonally differenced series will have s fewer observations than the original series.
+```{r}
+# x<-read.csv("x.csv")
+# # Generate a diff of x with lag = 4. Save this to dx
+# dx <- diff(x,lag=4)
+#   
+# # Plot dx
+# ts.plot(dx)
+#   
+# 
+# # View the length of x and dx, respectively 
+# length(x)
+# length(dx)
+
+```
+Simulate the white noise model
+The white noise (WN) model is a basic time series model. It is also a basis for the more elaborate models we will consider. We will focus on the simplest form of WN, independent and identically distributed data.
+
+The arima.sim() function can be used to simulate data from a variety of time series models. ARIMA is an abbreviation for the autoregressive integrated moving average class of models we will consider throughout this course.
+
+An ARIMA(p, d, q) model has three parts, the autoregressive order p, the order of integration (or differencing) d, and the moving average order q. We will detail each of these parts soon, but for now we note that the ARIMA(0, 0, 0) model, i.e., with all of these components zero, is simply the WN model.
+
+In this exercise, you will practice simulating a basic WN model.
+```{r}
+# Simulate a WN model with list(order = c(0, 0, 0))
+white_noise <- arima.sim(model = list(order = c(0, 0, 0)), n = 100)
+
+# Plot your white_noise data
+ts.plot(white_noise)
+
+
+# Simulate from the WN model with: mean = 100, sd = 10
+white_noise_2 <- arima.sim(model = list(order = c(0, 0, 0)), n = 100, mean =100, sd = 10)
+
+# Plot your white_noise_2 data
+ts.plot(white_noise_2)
+
+
+
+```
+
+Estimate the white noise model
+For a given time series y we can fit the white noise (WN) model using the arima(..., order = c(0, 0, 0)) function. Recall that the WN model is an ARIMA(0,0,0) model. Applying the arima() function returns information or output about the estimated model. For the WN model this includes the estimated mean, labeled intercept, and the estimated variance, labeled sigma^2.
+
+In this exercise, you'll explore the qualities of the WN model. What is the estimated mean? Compare this with the sample mean using the mean() function. What is the estimated variance? Compare this with the sample variance using the var() function.
+
+The time series y has already been loaded, and is shown in the adjoining figure.
+
+```{r}
+# # Fit the WN model to y using the arima command
+# arima(y,order=c(0,0,0))
+# 
+# # Calculate the sample mean and sample variance of y
+# 
+# mean(y)
+# var(y)
+
+```
+##3. Correlation analysis and the autocorrelation function
+Asset prices vs. asset returns
+The goal of investing is to make a profit. The revenue or loss from investing depends on the amount invested and changes in prices, and high revenue relative to the size of an investment is of central interest. This is what financial asset returns measure, changes in price as a fraction of the initial price over a given time horizon, for example, one business day.
+
+Let's again consider the eu_stocks dataset. This dataset reports index values, which we can regard as prices. The indices are not investable assets themselves, but there are many investable financial assets that closely track major market indices, including mutual funds and exchange traded funds.
+
+Log returns, also called continuously compounded returns, are also commonly used in financial time series analysis. They are the log of gross returns, or equivalently, the changes (or first differences) in the logarithm of prices.
+
+The change in appearance between daily prices and daily returns is typically substantial, while the difference between daily returns and log returns is usually small. As you'll see later, one advantage of using log returns is that calculating multi-period returns from individual periods is greatly simplified - you just add them together!
+
+In this exercise, you'll further explore the eu_stocks dataset, including plotting prices, converting prices to (net) returns, and converting prices to log returns.
+
+```{r}
+# Plot eu_stocks
+plot(eu_stocks)
+
+# Use this code to convert prices to returns
+returns <- eu_stocks[-1,] / eu_stocks[-1860,] - 1
+
+# Convert returns to ts
+returns <- ts(returns, start = c(1991, 130), frequency =260)
+
+# Plot returns
+
+plot(returns)
+# Use this code to convert prices to log returns
+logreturns <- diff(log(eu_stocks))
+
+# Plot logreturns
+plot(logreturns)
+
+```
+Characteristics of financial time series
+Daily financial asset returns typically share many characteristics. Returns over one day are typically small, and their average is close to zero. At the same time, their variances and standard deviations can be relatively large. Over the course of a few years, several very large returns (in magnitude) are typically observed. These relative outliers happen on only a handful of days, but they account for the most substantial movements in asset prices. Because of these extreme returns, the distribution of daily asset returns is not normal, but heavy-tailed, and sometimes skewed. In general, individual stock returns typically have even greater variability and more extreme observations than index returns.
+
+In this exercise, you'll work with the eu_percentreturns dataset, which is the percentage returns calculated from your eu_stocks data. For each of the four indices contained in your data, you'll calculate the sample mean, variance, and standard deviation.
+
+Notice that the average daily return is about 0, while the standard deviation is about 1 percentage point. Also apply the hist() and qqnorm() functions to make histograms and normal quantile plots, respectively, for each of the indices.
+The apply() command is very versatile but requires several arguments, including specifying the object of interest (the X argument), the MARGIN (in this case, 2 to indicate applying the function over columns), and the FUN for the function itself. After these arguments,the apply() command takes additional arguments that are relevant for the function being applied. If you're confused, you can access the help documentation for this command by typing ?apply into your R console.
+
+```{r}
+# Generate means from eu_percentreturns
+eu_percentreturns<-returns*100
+colMeans(eu_percentreturns) 
+
+# Use apply to calculate sample variance from eu_percentreturns
+apply(eu_percentreturns, MARGIN = 2, FUN = var)
+
+# Use apply to calculate standard deviation from eu_percentreturns
+apply(eu_percentreturns, MARGIN = 2, FUN = sd)
+
+# Display a histogram of percent returns for each index
+par(mfrow = c(2,2))
+apply(eu_percentreturns, MARGIN = 2, FUN = hist, main = "", xlab = "Percentage Return")
+
+# Display normal quantile plots of percent returns for each index
+par(mfrow = c(2,2))
+apply(eu_percentreturns, MARGIN = 2, FUN = qqnorm, main = "")
+qqline(eu_percentreturns)
+
+```
+
+Plotting pairs of data
+Time series data is often presented in a time series plot. For example, the index values from the eu_stocks dataset are shown in the adjoining figure. Recall, eu_stocks contains daily closing prices from 1991-1998 for the major stock indices in Germany (DAX), Switzerland (SMI), France (CAC), and the UK (FTSE).
+
+It is also useful to examine the bivariate relationship between pairs of time series. In this exercise we will consider the contemporaneous relationship, that is matching observations that occur at the same time, between pairs of index values as well as their log returns. The plot(a, b) function will produce a scatterplot when two time series names a and b are given as input.
+
+To simultaneously make scatterplots for all pairs of several assets the pairs() function can be applied to produce a scatterplot matrix. When shared time trends are present in prices or index values it is common to instead compare their returns or log returns.
+
+In this exercise, you'll practice these skills on the eu_stocks data. Because the DAX and FTSE returns have similar time coverage, you can easily make a scatterplot of these indices. Note that the normal distribution has elliptical contours of equal probability, and pairs of data drawn from the multivariate normal distribution form a roughly elliptically shaped point cloud. Do any of the pairs in the scatterplot matrices exhibit this pattern, before or after log transformation?
+
+```{r}
+DAX<-eu_stocks[,1]
+FTSE<-eu_stocks[,3] 
+# Make a scatterplot of DAX and FTSE
+plot(DAX, FTSE)
+
+# Make a scatterplot matrix of eu_stocks
+pairs(eu_stocks)
+
+# Convert eu_stocks to log returns
+logreturns <- diff(log(eu_stocks))
+
+# Plot logreturns
+plot(logreturns)
+
+# Make a scatterplot matrix of logreturns
+pairs(logreturns)
+
+```
+Calculating sample covariances and correlations
+Sample covariances measure the strength of the linear relationship between matched pairs of variables. The cov() function can be used to calculate covariances for a pair of variables, or a covariance matrix when a matrix containing several variables is given as input. For the latter case, the matrix is symmetric with covariances between variables on the off-diagonal and variances of the variables along the diagonal. On the right you can see the scatterplot matrix of your logreturns data.
+
+Covariances are very important throughout finance, but they are not scale free and they can be difficult to directly interpret. Correlation is the standardized version of covariance that ranges in value from -1 to 1, where values close to 1 in magnitude indicate a strong linear relationship between pairs of variables. The cor() function can be applied to both pairs of variables as well as a matrix containing several variables, and the output is interpreted analogously.
+
+In this exercise, you'll use cov() and cor() to explore your logreturns data.
+```{r}
+x<-read.csv("x1.csv")
+x<-ts(x)
+n<-length(x)
+n
+# Define x_t0 as x[-1]
+x_t0 <- x[-1]
+
+# Define x_t1 as x[-n]
+x_t1 <- x[-n]
+
+# Confirm that x_t0 and x_t1 are (x[t], x[t-1]) pairs  
+head(cbind(x_t0, x_t1))
+
+# Plot x_t0 and x_t1
+plot(x_t0,x_t1)
+
+# View the correlation between x_t0 and x_t1
+cor(x_t0,x_t1)
+
+# Use acf with x
+acf(x, lag.max = 1, plot =FALSE)
+
+# Confirm that difference factor is (n-1)/n
+cor(x_t1, x_t0) * (n-1)/n
+
+```
+
+The autocorrelation function
+Autocorrelations can be estimated at many lags to better assess how a time series relates to its past. We are typically most interested in how a series relates to its most recent past.
+
+The acf(..., lag.max = ..., plot = FALSE) function will estimate all autocorrelations from 0, 1, 2,..., up to the value specified by the argument lag.max. In the previous exercise, you focused on the lag-1 autocorrelation by setting the lag.max argument to 1.
+
+In this exercise, you'll explore some further applications of the acf() command. Once again, the time series x has been preloaded for you and is shown in the plot on the right.
+
+```{r}
+
+# Generate ACF estimates for x up to lag-10
+acf(x, lag.max =10, plot = FALSE)
+
+# Type the ACF estimate at lag-10 
+acf(x, lag.max =0.100, plot = FALSE)
+
+
+# Type the ACF estimate at lag-5
+acf(x, lag.max =0.198, plot = FALSE)
+
+```
+
+Visualizing the autocorrelation function
+Estimating the autocorrelation function (ACF) at many lags allows us to assess how a time series x relates to its past. The numeric estimates are important for detailed calculations, but it is also useful to visualize the ACF as a function of the lag.
+
+In fact, the acf() command produces a figure by default. It also makes a default choice for lag.max, the maximum number of lags to be displayed.
+
+Three time series x, y, and z have been loaded into your R environment and are plotted on the right. The time series x shows strong persistence, meaning the current value is closely relatively to those that proceed it. The time series y shows a periodic pattern with a cycle length of approximately four observations, meaning the current value is relatively close to the observation four before it. The time series z does not exhibit any clear pattern.
+
+In this exercise, you'll plot an estimated autocorrelation function for each time series. In the plots produced by acf(), the lag for each autocorrelation estimate is denoted on the horizontal axis and each autocorrelation estimate is indicated by the height of the vertical bars. Recall that the ACF at lag-0 is always 1.
+
+Finally, each ACF figure includes a pair of blue, horizontal, dashed lines representing lag-wise 95% confidence intervals centered at zero. These are used for determining the statistical significance of an individual autocorrelation estimate at a given lag versus a null value of zero, i.e., no autocorrelation at that lag.
+
+
+```{r}
+# View the ACF of x
+acf(x)
+
+# View the ACF of y
+# acf(y)
+
+# View the ACF of z
+acf(z)
+
+```
+##4. Autoregression
+Simulate the autoregressive model
+The autoregressive (AR) model is arguably the most widely used time series model. It shares the very familiar interpretation of a simple linear regression, but here each observation is regressed on the previous observation. The AR model also includes the white noise (WN) and random walk (RW) models examined in earlier chapters as special cases.
+
+The versatile arima.sim() function used in previous chapters can also be used to simulate data from an AR model by setting the model argument equal to list(ar = phi) , in which phi is a slope parameter from the interval (-1, 1). We also need to specify a series length n.
+
+In this exercise, you will use this command to simulate and plot three different AR models with slope parameters equal to 0.5, 0.9, and -0.75, respectively.
+
+```{r}
+# Simulate an AR model with 0.5 slope
+x <- arima.sim(model = list(ar=0.5), n = 100)
+
+# Simulate an AR model with 0.9 slope
+y <- arima.sim(model=list(ar=0.9),n=100)
+
+# Simulate an AR model with -0.75 slope
+z <- arima.sim(model=list(ar=-0.75),n=100)
+
+# Plot your simulated data
+plot.ts(cbind(x,y, z))
+
+```
+Estimate the autocorrelation function (ACF) for an autoregression
+What if you need to estimate the autocorrelation function from your data? To do so, you'll need the acf() command, which estimates autocorrelation by exploring lags in your data. By default, this command generates a plot of the relationship between the current observation and lags extending backwards.
+
+In this exercise, you'll use the acf() command to estimate the autocorrelation function for three new simulated AR series (x, y, and z). These objects have slope parameters 0.5, 0.9, and -0.75, respectively, and are shown in the adjoining figure.
+
+
+```{r}
+# Calculate the ACF for x
+acf(x)
+
+# Calculate the ACF for y
+acf(y)
+
+# Calculate the ACF for z
+acf(z)
+
+```
+
+Compare the random walk (RW) and autoregressive (AR) models
+The random walk (RW) model is a special case of the autoregressive (AR) model, in which the slope parameter is equal to 1. Recall from previous chapters that the RW model is not stationary and exhibits very strong persistence. Its sample autocovariance function (ACF) also decays to zero very slowly, meaning past values have a long lasting impact on current values.
+
+The stationary AR model has a slope parameter between -1 and 1. The AR model exhibits higher persistence when its slope parameter is closer to 1, but the process reverts to its mean fairly quickly. Its sample ACF also decays to zero at a quick (geometric) rate, indicating that values far in the past have little impact on future values of the process.
+
+In this exercise, you'll explore these qualities by simulating and plotting additional data from an AR model.
+```{r}
+# Simulate and plot AR model with slope 0.9 
+x <- arima.sim(model = list(ar=0.9), n = 200)
+ts.plot(x)
+acf(x)
+
+# Simulate and plot AR model with slope 0.98
+y <- arima.sim(model=list(ar=0.98),n=200)
+ts.plot(y)
+acf(y)
+
+
+# Simulate and plot RW model
+z <-arima.sim(model = list(order = c(0, 1, 0)), n = 200)
+ts.plot(z)
+acf(z)
+
+```
+Estimate the autoregressive (AR) model
+For a given time series x we can fit the autoregressive (AR) model using the arima() command and setting order equal to c(1, 0, 0). Note for reference that an AR model is an ARIMA(1, 0, 0) model.
+
+In this exercise, you'll explore additional qualities of the AR model by practicing the arima() command on a simulated time series x as well as the AirPassengers data. This command allows you to identify the estimated slope (ar1), mean (intercept), and innovation variance (sigma^2) of the model.
+
+Both xand the AirPassengers data are preloaded in your environment. The time series x is shown in the figure on the right.
+
+```{r}
+# Fit the AR model to x
+arima(x, order =c(1,0,0))
+
+# Copy and paste the slope (ar1) estimate
+0.8575
+
+# Copy and paste the slope mean (intercept) estimate
+-0.0948
+
+# Copy and paste the innovation variance (sigma^2) estimate
+1.022
+# Fit the AR model to AirPassengers
+AR <-arima(AirPassengers,order=c(1,0,0))
+print(AR)
+
+# Run the following commands to plot the series and fitted values
+ts.plot(AirPassengers)
+AR_fitted <- AirPassengers - residuals(AR)
+points(AR_fitted, type = "l", col = 2, lty = 2)
+
+
+```
+Simple forecasts from an estimated AR model
+Now that you've modeled your data using the arima() command, you are ready to make simple forecasts based on your model. The predict() function can be used to make forecasts from an estimated AR model. In the object generated by your predict() command, the $pred value is the forceast, and the $se value is the standard error for the forceast.
+
+To make predictions for several periods beyond the last observations, you can use the n.ahead argument in your predict() command. This argument establishes the forecast horizon (h), or the number of periods being forceast. The forecasts are made recursively from 1 to h-steps ahead from the end of the observed time series.
+
+In this exercise, you'll make simple forecasts using an AR model applied to the Nile data, which records annual observations of the flow of the River Nile from 1871 to 1970.
+
+
+```{r}
+# Simulate an AR model with 0.5 slope
+x <- arima.sim(model = list(ar=0.5), n = 100)
+
+# Simulate an AR model with 0.9 slope
+y <- arima.sim(model=list(ar=0.9),n=100)
+
+# Simulate an AR model with -0.75 slope
+z <- arima.sim(model=list(ar=-0.75),n=100)
+
+# Plot your simulated data
+plot.ts(cbind(x,y, z))
+
+
+# Simulate and plot AR model with slope 0.9 
+x <- arima.sim(model = list(ar=0.9), n = 200)
+ts.plot(x)
+acf(x)
+
+# Simulate and plot AR model with slope 0.98
+y <- arima.sim(model=list(ar=0.98),n=200)
+ts.plot(y)
+acf(y)
+
+
+# Simulate and plot RW model
+z <-arima.sim(model = list(order = c(0, 1, 0)), n = 200)
+ts.plot(z)
+acf(z)
+
+# Fit an AR model to Nile
+AR_fit <-arima(Nile, order  =c(1,0,0))
+print(AR_fit)
+
+# Use predict() to make a 1-step forecast
+predict_AR<- predict(AR_fit, n.ahead = 1)
+
+# Obtain the 1-step forecast using $pred[1]
+predict_AR$pred[1]
+
+
+# Use predict to make 1-step through 10-step forecasts
+predict(AR_fit, n.ahead = 10)
+
+
+
+
+
+
+
+
+
+
+
+
+
+# Fit an AR model to Nile
+AR_fit <-arima(Nile, order  =c(1,0,0))
+print(AR_fit)
+
+# Use predict() to make a 1-step forecast
+predict_AR<- predict(AR_fit, n.ahead = 1)
+
+# Obtain the 1-step forecast using $pred[1]
+predict_AR$pred[1]
+
+```
+  
+##5. A simple moving average
+Simulate the simple moving average model
+The simple moving average (MA) model is a parsimonious time series model used to account for very short-run autocorrelation. It does have a regression like form, but here each observation is regressed on the previous innovation, which is not actually observed. Like the autoregressive (AR) model, the MA model includes the white noise (WN) model as special case.
+
+As with previous models, the MA model can be simulated using the arima.sim() command by setting the model argument to list(ma = theta), where theta is a slope parameter from the interval (-1, 1). Once again, you also need to specifcy the series length using the n argument.
+
+In this exercise, you'll simulate and plot three MA models with slope parameters 0.5, 0.9, and -0.5, respectively.
+
+```{r}
+# Generate MA model with slope 0.5
+x <- arima.sim(model = list(ma=0.5), n =100)
+
+# Generate MA model with slope 0.9
+y <- arima.sim(model=list(ma=0.9),n=100)
+
+# Generate MA model with slope -0.5
+z <- arima.sim(model=list(ma=-0.5),n=100)
+
+# Plot all three models together
+plot.ts(cbind(x,y,z))
+
+```
+Estimate the autocorrelation function (ACF) for a moving average
+Now that you've simulated some MA data using the arima.sim() command, you may want to estimate the autocorrelation functions (ACF) for your data. As in the previous chapter, you can use the acf() command to generate plots of the autocorrelation in your MA data.
+
+In this exercise, you'll use acf() to estimate the ACF for three simulated MA series, x, y, and z. These series have slope parameters of 0.4, 0.9, and -0.75, respectively, and are shown in the figure on the right.
+
+```{r}
+# Calculate ACF for x
+acf(x)
+
+# Calculate ACF for y
+acf(y)
+
+# Calculate ACF for z
+acf(z)
+
+
+```
+Estimate the simple moving average model
+Now that you've simulated some MA models and calculated the ACF from these models, your next step is to fit the simple moving average (MA) model to some data using the arima() command. For a given time series x we can fit the simple moving average (MA) model using arima(..., order = c(0, 0, 1)). Note for reference that an MA model is an ARIMA(0, 0, 1) model.
+
+In this exercise, you'll practice using a preloaded time series (x, shown in the plot on the right) as well as the Nile dataset used in earlier chapters.
+
+
+
+```{r}
+# Fit the MA model to x
+arima(x, order = c(0,0,1))
+
+# Paste the slope (ma1) estimate below
+0.7928
+
+# Paste the slope mean (intercept) estimate below
+0.1589
+
+# Paste the innovation variance (sigma^2) estimate below
+0.9576
+
+# Fit the MA model to Nile
+MA <- arima(Nile, order =c(0,0,1))
+print(MA)
+
+# Plot Nile and MA_fit 
+ts.plot(Nile)
+MA_fit <- Nile - resid(MA)
+points(MA_fit, type = "l", col = 2, lty = 2)
+
+```
+Simple forecasts from an estimated MA model
+Now that you've estimated a MA model with your Nile data, the next step is to do some simple forecasting with your model. As with other types of models, you can use the predict() function to make simple forecasts from your estimated MA model. Recall that the $pred value is the forecast, while the $se value is a standard error for that forecast, each of which is based on the fitted MA model.
+
+Once again, to make predictions for several periods beyond the last observation you can use the n.ahead = h argument in your call to predict(). The forecasts are made recursively from 1 to h-steps ahead from the end of the observed time series. However, note that except for the 1-step forecast, all forecasts from the MA model are equal to the estimated mean (intercept).
+
+In this exercise, you'll use the MA model derived from your Nile data to make simple forecasts about future River Nile flow levels. Your MA model from the previous exercise is available in your environment.
+
+```{r}
+# Make a 1-step forecast based on MA
+predict_MA <-predict(MA,n.ahead=1)
+
+# Obtain the 1-step forecast using $pred[1]
+predict_MA$pred[1]
+
+# Make a 1-step through 10-step forecast based on MA
+predict(MA,n.ahead=10)
+
+# Plot the Nile series plus the forecast and 95% prediction intervals
+ts.plot(Nile, xlim = c(1871, 1980))
+MA_forecasts <- predict(MA, n.ahead = 10)$pred
+MA_forecast_se <- predict(MA, n.ahead = 10)$se
+points(MA_forecasts, type = "l", col = 2)
+points(MA_forecasts - 2*MA_forecast_se, type = "l", col = 2, lty = 2)
+points(MA_forecasts + 2*MA_forecast_se, type = "l", col = 2, lty = 2)
+
+```
+AR vs MA models
+As you've seen, autoregressive (AR) and simple moving average (MA) are two useful approaches to modeling time series. But how can you determine whether an AR or MA model is more appropriate in practice?
+
+To determine model fit, you can measure the Akaike information criterion (AIC) and Bayesian information criterion (BIC) for each model. While the math underlying the AIC and BIC is beyond the scope of this course, for your purposes the main idea is these these indicators penalize models with more estimated parameters, to avoid overfitting, and smaller values are preferred. All factors being equal, a model that produces a lower AIC or BIC than another model is considered a better fit.
+
+To estimate these indicators, you can use the AIC() and BIC() commands, both of which require a single argument to specify the model in question.
+
+In this exercise, you'll return to the Nile data and the AR and MA models you fitted to this data. These models and their predictions for the 1970s (AR_fit) and (MA_fit) are depicted in the plot on the right.
+
+
+```{r}
+# # Find correlation between AR_fit and MA_fit
+# cor(AR_fit, MA_fit)
+# 
+# # Find AIC of AR
+# AIC(AR)
+# 
+# # Find AIC of MA
+# AIC(MA)
+# 
+# # Find BIC of AR
+# BIC(AR)
+# 
+# # Find BIC of MA
+# BIC(MA)
+
+```
+
